@@ -35,7 +35,8 @@
     "node-assist": "^0.4.0",
     "p-js-utils": "^0.0.5",
     "uload-bitcoinjs-lib": "^3.3.5",
-    "ulord-bitcore-lib": "^0.2.1"
+    "ulord-bitcore-lib": "^0.2.1",
+    "dashcore-lib": "^8.2.3"
   },
   "babel": {
     "presets": [
