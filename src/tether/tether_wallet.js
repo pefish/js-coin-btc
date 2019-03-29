@@ -38,7 +38,7 @@ export default class TetherWalletHelper extends BaseBitcoinjsLib {
    * @param tokenType {number} 货币类型
    * @param utxos {array} 输入
    * @param targetAddress {string} usdt打给谁
-   * @param targetAmount {string} 目标地址btc，单位btc，null是取最小数值
+   * @param targetAmount {string} 目标地址btc，单位shatoxi，null是取最小数值
    * @param changeAddress {string} btc找零给谁
    * @param fee {string} 支付的BTC手续费. 单位最小
    * @param targets {array} btc还要打给谁

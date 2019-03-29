@@ -110,7 +110,7 @@ describe('usdtWalletHelper', () => {
         scriptPubKey: 'a914c80fda0d07bff0f579849ade15848adbbe0ba69387',
         type: 'p2sh(p2wpkh)' } ],
         '2NFPRnfbSXDozGNS8T13hUUj8qgCBK88ayi',
-        null,
+        `546`,
         '2NBV483qX29Zd7yCPUUmUCCXpLnu51EExwP',
         '10000',
         [],

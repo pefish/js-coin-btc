@@ -33,20 +33,30 @@ describe('bitcoinWalletHelper', () => {
   //     assert.throws(() => {}, err)
   //   }
   // })
-
-  it('geneAddress', async () => {
+  it('getAddressFromWif', async () => {
     try {
-      const masterPair = walletHelper.getMasterPairBySeedBuffer('da2a48a1b9fbade07552281143814b3cd7ba4b53a7de5241439417b9bb540e229c45a30b0ce32174aaccc80072df7cbdff24f0c0ae327cd5170d1f276b890173'.hexToBuffer(), testnet)
-      const result = walletHelper.deriveAllByXprivPath(masterPair['xpriv'], 'm/0/0', testnet)
-      const segwitAddress1 = walletHelper.getAddressFromPublicKey(result['publicKey'], 'p2sh(p2wpkh)', testnet)
-       logger.error(result, segwitAddress1)
-      assert.strictEqual(result['address'], 'mv6e9rWT1y4EzN4CHj81Piw6p9Y3ispJ45')
-      assert.strictEqual(segwitAddress1, '2NBV483qX29Zd7yCPUUmUCCXpLnu51EExwP')
+      const result = walletHelper.getAddressFromWif('cPo4ftCfL4i1HfEpHYZ8v74Gv3faFnYV5Mfw1QtAiXCNYH1aZ7vW', "p2sh(p2wpkh)", 'mainnet')
+      logger.error(result)
+      // assert.strictEqual(result, 'da2a48a1b9fbade07552281143814b3cd7ba4b53a7de5241439417b9bb540e229c45a30b0ce32174aaccc80072df7cbdff24f0c0ae327cd5170d1f276b890173')
     } catch (err) {
       logger.error(err)
       assert.throws(() => {}, err)
     }
   })
+
+  // it('geneAddress', async () => {
+  //   try {
+  //     const masterPair = walletHelper.getMasterPairBySeedBuffer('da2a48a1b9fbade07552281143814b3cd7ba4b53a7de5241439417b9bb540e229c45a30b0ce32174aaccc80072df7cbdff24f0c0ae327cd5170d1f276b890173'.hexToBuffer(), testnet)
+  //     const result = walletHelper.deriveAllByXprivPath(masterPair['xpriv'], 'm/0/0', testnet)
+  //     const segwitAddress1 = walletHelper.getAddressFromPublicKey(result['publicKey'], 'p2sh(p2wpkh)', testnet)
+  //      logger.error(result, segwitAddress1)
+  //     assert.strictEqual(result['address'], 'mv6e9rWT1y4EzN4CHj81Piw6p9Y3ispJ45')
+  //     assert.strictEqual(segwitAddress1, '2NBV483qX29Zd7yCPUUmUCCXpLnu51EExwP')
+  //   } catch (err) {
+  //     logger.error(err)
+  //     assert.throws(() => {}, err)
+  //   }
+  // })
 
   // it('buildTransaction1', async () => {
   //   try {
