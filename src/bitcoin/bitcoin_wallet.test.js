@@ -12,9 +12,9 @@ describe('bitcoinWalletHelper', () => {
     walletHelper = new BitcoinWalletHelper()
   })
 
-  // it('getMasterPairByMnemonic', async () => {
+  // it('getAllFromXpriv', async () => {
   //   try {
-  //     const result = walletHelper.getMasterPairByMnemonic('basket actual', '', 'mainnet')
+  //     const result = walletHelper.getAllFromXpriv('', mainnet)
   //     logger.error(result)
   //     // assert.strictEqual(result, 'da2a48a1b9fbade07552281143814b3cd7ba4b53a7de5241439417b9bb540e229c45a30b0ce32174aaccc80072df7cbdff24f0c0ae327cd5170d1f276b890173')
   //   } catch (err) {
@@ -22,7 +22,81 @@ describe('bitcoinWalletHelper', () => {
   //     assert.throws(() => {}, err)
   //   }
   // })
-  //
+
+  // it('getAllFromXpub', async () => {
+  //   try {
+  //     const result = walletHelper.getAllFromXpub(walletHelper.convertPub(`xpub`, 'xpub661MyMwAqRbcEpnpQf9ngsPD8fnWWKZMnm1ibf27ZRVUJq36mrGFpoAWd1faYSDnhRt6JKwCYV8vuMpg5Jf3f1nLFFW2YfVmrSv5Ae5me8h'), mainnet)
+  //     logger.error(result)
+  //     // assert.strictEqual(result, 'da2a48a1b9fbade07552281143814b3cd7ba4b53a7de5241439417b9bb540e229c45a30b0ce32174aaccc80072df7cbdff24f0c0ae327cd5170d1f276b890173')
+  //   } catch (err) {
+  //     logger.error(err)
+  //     assert.throws(() => {}, err)
+  //   }
+  // })
+
+  // it('deriveAllByXpubPath', async () => {
+  //   try {
+  //     const result = walletHelper.deriveAllByXpubPath('', `0`, mainnet)
+  //     logger.error(result)
+  //     logger.error(walletHelper.getAddressFromPublicKey(result[`publicKey`], `p2sh(p2wpkh)`, mainnet))
+  //     // assert.strictEqual(result, 'da2a48a1b9fbade07552281143814b3cd7ba4b53a7de5241439417b9bb540e229c45a30b0ce32174aaccc80072df7cbdff24f0c0ae327cd5170d1f276b890173')
+  //   } catch (err) {
+  //     logger.error(err)
+  //     assert.throws(() => {}, err)
+  //   }
+  // })
+
+  // it('deriveAllByXprivPath', async () => {
+  //   try {
+  //     const result = walletHelper.deriveAllByXprivPath(``, `m/49'/0'/0'/0`, mainnet)
+  //     logger.error(result)
+  //     logger.error(walletHelper.getAddressFromPublicKey(result[`publicKey`], `p2sh(p2wpkh)`, mainnet))
+  //     logger.error(walletHelper.convertPub(`ypub`, result[`xpub`]))
+  //     // assert.strictEqual(result['address'], 'mv6e9rWT1y4EzN4CHj81Piw6p9Y3ispJ45')
+  //     // assert.strictEqual(segwitAddress1, '2NBV483qX29Zd7yCPUUmUCCXpLnu51EExwP')
+  //   } catch (err) {
+  //     logger.error(err)
+  //     assert.throws(() => {}, err)
+  //   }
+  // })
+
+  // it('getAddressFromPublicKey', async () => {
+  //   try {
+  //     logger.error(walletHelper.getAddressFromPublicKey('03eda95befaa86b35330a438cb874e3894658c631264597f9323f475a6d5043d8d', `p2pkh`, mainnet))
+  //     logger.error(walletHelper.getAddressFromPublicKey('03eda95befaa86b35330a438cb874e3894658c631264597f9323f475a6d5043d8d', `p2wpkh`, mainnet))
+  //     logger.error(walletHelper.getAddressFromPublicKey('03eda95befaa86b35330a438cb874e3894658c631264597f9323f475a6d5043d8d', `p2wsh`, mainnet))
+  //     logger.error(walletHelper.getAddressFromPublicKey('03eda95befaa86b35330a438cb874e3894658c631264597f9323f475a6d5043d8d', `p2sh`, mainnet))
+  //     logger.error(walletHelper.getAddressFromPublicKey('03eda95befaa86b35330a438cb874e3894658c631264597f9323f475a6d5043d8d', `p2sh(p2wpkh)`, mainnet))
+  //     logger.error(walletHelper.getAddressFromPublicKey('03eda95befaa86b35330a438cb874e3894658c631264597f9323f475a6d5043d8d', `p2sh(p2wsh)`, mainnet))
+  //     // assert.strictEqual(result, 'da2a48a1b9fbade07552281143814b3cd7ba4b53a7de5241439417b9bb540e229c45a30b0ce32174aaccc80072df7cbdff24f0c0ae327cd5170d1f276b890173')
+  //   } catch (err) {
+  //     logger.error(err)
+  //     assert.throws(() => {}, err)
+  //   }
+  // })
+
+  // it('validateMnemonic', async () => {
+  //   try {
+  //     const result = walletHelper.validateMnemonic('')
+  //     logger.error(result)
+  //     // assert.strictEqual(result, 'da2a48a1b9fbade07552281143814b3cd7ba4b53a7de5241439417b9bb540e229c45a30b0ce32174aaccc80072df7cbdff24f0c0ae327cd5170d1f276b890173')
+  //   } catch (err) {
+  //     logger.error(err)
+  //     assert.throws(() => {}, err)
+  //   }
+  // })
+
+  // it('getMasterPairByMnemonic', async () => {
+  //   try {
+  //     const result = walletHelper.getMasterPairByMnemonic('position fame color hobby upset hospital salt garden negative trophy crop fan', '', 'mainnet')
+  //     logger.error(result)
+  //     // assert.strictEqual(result, 'da2a48a1b9fbade07552281143814b3cd7ba4b53a7de5241439417b9bb540e229c45a30b0ce32174aaccc80072df7cbdff24f0c0ae327cd5170d1f276b890173')
+  //   } catch (err) {
+  //     logger.error(err)
+  //     assert.throws(() => {}, err)
+  //   }
+  // })
+
   // it('geneSeed', async () => {
   //   try {
   //     const result = walletHelper.getSeedHexByMnemonic('test', 'test')
@@ -33,25 +107,11 @@ describe('bitcoinWalletHelper', () => {
   //     assert.throws(() => {}, err)
   //   }
   // })
-  it('getAddressFromWif', async () => {
-    try {
-      const result = walletHelper.getAddressFromWif('cPo4ftCfL4i1HfEpHYZ8v74Gv3faFnYV5Mfw1QtAiXCNYH1aZ7vW', "p2sh(p2wpkh)", 'mainnet')
-      logger.error(result)
-      // assert.strictEqual(result, 'da2a48a1b9fbade07552281143814b3cd7ba4b53a7de5241439417b9bb540e229c45a30b0ce32174aaccc80072df7cbdff24f0c0ae327cd5170d1f276b890173')
-    } catch (err) {
-      logger.error(err)
-      assert.throws(() => {}, err)
-    }
-  })
-
-  // it('geneAddress', async () => {
+  // it('getAddressFromWif', async () => {
   //   try {
-  //     const masterPair = walletHelper.getMasterPairBySeedBuffer('da2a48a1b9fbade07552281143814b3cd7ba4b53a7de5241439417b9bb540e229c45a30b0ce32174aaccc80072df7cbdff24f0c0ae327cd5170d1f276b890173'.hexToBuffer(), testnet)
-  //     const result = walletHelper.deriveAllByXprivPath(masterPair['xpriv'], 'm/0/0', testnet)
-  //     const segwitAddress1 = walletHelper.getAddressFromPublicKey(result['publicKey'], 'p2sh(p2wpkh)', testnet)
-  //      logger.error(result, segwitAddress1)
-  //     assert.strictEqual(result['address'], 'mv6e9rWT1y4EzN4CHj81Piw6p9Y3ispJ45')
-  //     assert.strictEqual(segwitAddress1, '2NBV483qX29Zd7yCPUUmUCCXpLnu51EExwP')
+  //     const result = walletHelper.getAddressFromWif('cPo4ftCfL4i1HfEpHYZ8v74Gv3faFnYV5Mfw1QtAiXCNYH1aZ7vW', "p2sh(p2wpkh)", 'mainnet')
+  //     logger.error(result)
+  //     // assert.strictEqual(result, 'da2a48a1b9fbade07552281143814b3cd7ba4b53a7de5241439417b9bb540e229c45a30b0ce32174aaccc80072df7cbdff24f0c0ae327cd5170d1f276b890173')
   //   } catch (err) {
   //     logger.error(err)
   //     assert.throws(() => {}, err)
@@ -155,14 +215,14 @@ describe('bitcoinWalletHelper', () => {
   //         "0201e2e960cf3f05dd8f0a2136d4c430cb45daeb2c537e38a4d653ab9de79b8f75"
   //       ],
   //       m: 2
-  //     }, 'p2sh(p2wsh)_multisig', testnet)
+  //     }, 'p2sh(p2wpkh)_multisig', testnet)
   //     assert.strictEqual(address, '2N4fbYKCkNLLLfzJH7WfQRwYKpJTz7a5gX6')
   //   } catch (err) {
   //     logger.error(err)
   //     assert.throws(() => {}, err)
   //   }
   // })
-  //
+
   // it('buildTransaction_multisig_tx', async () => {
   //   try {
   //     const tx = await walletHelper.buildTransaction(

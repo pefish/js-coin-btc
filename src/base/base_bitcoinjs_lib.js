@@ -32,6 +32,12 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
     return bip39Lib.validateMnemonic(mnemonic)
   }
 
+  /**
+   * 由种子得到主密钥
+   * @param seedBuffer
+   * @param network
+   * @returns {{seed: string, xpriv: *, xpub: *, address: *, chainCode: *, privateKey, publicKey: *, wif: string|*}}
+   */
   getMasterPairBySeedBuffer (seedBuffer, network = 'testnet') {
     const node = this._bitcoin.HDNode.fromSeedBuffer(seedBuffer, this._bitcoin.networks[network])
     return {
@@ -47,7 +53,7 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
   }
 
   /**
-   * 由助记码得到主密钥
+   * 由助记码得到主密钥(bip32、44是xpub和xprv，bip49、141 p2sh(p2wpkh)是ypub和yprv，bip84、141 p2wpkh是zpub和zprv)
    * @param mnemonic
    * @param pass
    * @param network
@@ -55,13 +61,73 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
    */
   getMasterPairByMnemonic (mnemonic, pass = '', network = 'testnet') {
     const bip39Lib = require('bip39')
-    const seed = bip39Lib.mnemonicToSeed(mnemonic, pass) // 种子buffer
+    const seed = bip39Lib.mnemonicToSeedSync(mnemonic, pass) // 种子buffer
+
+    // 或者
+    // const bip32Lib = require('bip32')
+    // const root = bip32Lib.fromSeed(seed, this._bitcoin.networks[network])
+    // return {
+    //   seed: seed.toString('hex'),
+    //   xpriv: root.toBase58(),
+    //   xpub: root.neutered().toBase58()
+    // }
+
     const node = this._bitcoin.HDNode.fromSeedBuffer(seed, this._bitcoin.networks[network])  // node里面才是主公钥和主私钥
     return {
       seed: seed.toString('hex'),
-      xpriv: node.toBase58(),  // 主私钥, depth为0
+      xpriv: node.toBase58(),  // 主私钥, depth为0(BIP32 Root Key)
       xpub: node.neutered().toBase58()  // 主公钥, neutered是去掉私钥价值
     }
+  }
+
+  /**
+   * pub转换
+   * @param pubType {string}
+   * @param sourcePub {string}
+   * @returns {*}
+   */
+  convertPub (pubType, sourcePub) {
+    let prefix = ``
+    if (pubType === `xpub`) {
+      prefix = `0488b21e`
+    } else if (pubType === `ypub`) {
+      prefix = `049d7cb2`
+    } else if (pubType === `zpub`) {
+      prefix = `04b24746`
+    } else if (pubType === `Ypub`) {
+      prefix = `0295b43f`
+    } else {
+      throw new ErrorHelper(`type error`)
+    }
+    const b58 = require('bs58check')
+    let data = b58.decode(sourcePub)
+    data = data.slice(4)
+    data = Buffer.concat([prefix.hexToBuffer(), data])
+    return b58.encode(data)
+  }
+
+  /**
+   * prv转换
+   * @param prvType
+   * @param sourcePrv
+   * @returns {*}
+   */
+  convertPrv (prvType, sourcePrv) {
+    let prefix = ``
+    if (prvType === `xprv`) {
+      prefix = `0488ade4`
+    } else if (prvType === `yprv`) {
+      prefix = `049d7878`
+    } else if (prvType === `zprv`) {
+      prefix = `04b2430c`
+    } else {
+      throw new ErrorHelper(`type error`)
+    }
+    const b58 = require('bs58check')
+    let data = b58.decode(sourcePrv)
+    data = data.slice(4)
+    data = Buffer.concat([prefix.hexToBuffer(), data])
+    return b58.encode(data)
   }
 
   /**
@@ -70,7 +136,6 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
    * @param network
    */
   getNodeFromXpub (xpub, network = 'testnet') {
-
     return this._bitcoin.HDNode.fromBase58(xpub, this._bitcoin.networks[network]).neutered()
   }
 
@@ -80,7 +145,6 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
    * @param network
    */
   getNodeFromXpriv (xpriv, network = 'testnet') {
-
     return this._bitcoin.HDNode.fromBase58(xpriv, this._bitcoin.networks[network])
   }
 
@@ -90,7 +154,6 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
    * @param network
    */
   xprivToXpub (xpriv, network = 'testnet') {
-
     const node = this._bitcoin.HDNode.fromBase58(xpriv, this._bitcoin.networks[network])
     return node.neutered().toBase58()
   }
@@ -98,6 +161,27 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
   getAddressFromXpub(xpub, network = 'testnet') {
     const keyPair = this._bitcoin.HDNode.fromBase58(xpub, this._bitcoin.networks[network]).neutered().keyPair
     return keyPair.getAddress()
+  }
+
+  getAllFromXpub(xpub, network = 'testnet') {
+    const node = this._bitcoin.HDNode.fromBase58(xpub, this._bitcoin.networks[network]).neutered()
+    return {
+      address: node.keyPair.getAddress(),
+      chainCode: node.chainCode.toHexString(false),
+      publicKey: node.keyPair.getPublicKeyBuffer().toHexString(false)
+    }
+  }
+
+  getAllFromXpriv(xpriv, network = 'testnet') {
+    const currentNode = this._bitcoin.HDNode.fromBase58(xpriv, this._bitcoin.networks[network])
+    return {
+      xpriv: currentNode.toBase58(),
+      xpub: currentNode.neutered().toBase58(),
+      address: currentNode.keyPair.getAddress(),
+      wif: currentNode.keyPair.toWIF(),
+      privateKey: currentNode.keyPair.d.toHex(),
+      publicKey: currentNode.keyPair.getPublicKeyBuffer().toHexString(false)
+    }
   }
 
   /**
@@ -166,7 +250,7 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
       const keyPair = this._bitcoin.ECPair.fromPublicKeyBuffer(publicKey.hexToBuffer(), network)
       return keyPair.getAddress()
     } else if (type === 'p2wpkh') {
-      // bitcoind的bech32参数
+      // bitcoind的bech32参数(native segwit)
       const pubKeyHash = this._bitcoin.crypto.hash160(publicKey.hexToBuffer())
       const scriptPubKey = this._bitcoin.script.witnessPubKeyHash.output.encode(pubKeyHash)
       return this._bitcoin.address.fromOutputScript(scriptPubKey, network)
@@ -179,7 +263,7 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
       const scriptPubKey = this._bitcoin.script.scriptHash.output.encode(this._bitcoin.crypto.hash160(pubKeyHash))
       return this._bitcoin.address.fromOutputScript(scriptPubKey, network)
     } else if (type === 'p2sh(p2wpkh)') {
-      // 这就是segwit地址，bitcoind的p2sh-segwit参数
+      // 这就是segwit地址，bitcoind的p2sh-segwit参数(p2sh-segwit)
       const pubKeyHash = this._bitcoin.crypto.hash160(publicKey.hexToBuffer())
       const redeemScriptBuffer = this._bitcoin.script.witnessPubKeyHash.output.encode(pubKeyHash)
       const scriptPubKey = this._bitcoin.script.scriptHash.output.encode(this._bitcoin.crypto.hash160(redeemScriptBuffer))
@@ -231,7 +315,6 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
    * @param network
    */
   getWifFromXpriv(xpriv, network = 'testnet') {
-
     const keyPair = this._bitcoin.HDNode.fromBase58(xpriv, this._bitcoin.networks[network]).keyPair
     return keyPair.toWIF()
   }
@@ -261,17 +344,6 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
 
   getPrivateKeyFromMint(mintStr) {
     return CryptUtil.sha256(mintStr)
-  }
-
-  getAllFromXpriv(xpriv, network = 'testnet') {
-    const node = this._bitcoin.HDNode.fromBase58(xpriv, this._bitcoin.networks[network])
-    return {
-      address: node.keyPair.getAddress(),
-      wif: node.keyPair.toWIF(),
-      chainCode: node.chainCode.toHexString(false),
-      privateKey: node.keyPair.d.toHex(),
-      publicKey: node.keyPair.getPublicKeyBuffer().toHexString(false)
-    }
   }
 
   getPublicKeyFromWif(wif, network = 'testnet') {
@@ -317,56 +389,20 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
   }
 
   /**
-   * 由公钥和index推导出下级address
-   * @param xpub
-   * @param index
-   * @param network
-   * @returns {*}
-   */
-  deriveAddressByXpubIndex(xpub, index, network = 'testnet') {
-
-    const node = this._bitcoin.HDNode.fromBase58(xpub, this._bitcoin.networks[network]).neutered()
-    return node.derive(index).getAddress()
-  }
-
-  /**
-   * 由私钥和index推导出下级节点的所有信息
-   * @param xpriv
-   * @param index
-   * @param network
-   * @returns {{parentXpriv: *, index: *, xpriv, xpub, address: *, wif}}
-   */
-  deriveAllByXprivIndex(xpriv, index, network = 'testnet') {
-    const node = this._bitcoin.HDNode.fromBase58(xpriv, this._bitcoin.networks[network])
-    const currentNode = node.derive(index)
-    return {
-      parentXpriv: xpriv,
-      index: index,
-      xpriv: currentNode.toBase58(),
-      xpub: currentNode.neutered().toBase58(),
-      address: currentNode.keyPair.getAddress(),
-      wif: currentNode.keyPair.toWIF(),
-      privateKey: currentNode.keyPair.d.toHex(),
-      publicKey: currentNode.keyPair.getPublicKeyBuffer().toHexString(false)
-    }
-  }
-
-  /**
-   * 由私钥和path推导出下级节点的所有信息
+   * 由私钥和path推导出下级节点的所有信息，path中带有'的地址称为hardened address
    * @param xpriv
    * @param path
    * @param network
    * @returns {{parentXpriv: *, index: *, xpriv, xpub, address: *, wif}}
    */
   deriveAllByXprivPath(xpriv, path, network = 'testnet') {
-
     const node = this._bitcoin.HDNode.fromBase58(xpriv, this._bitcoin.networks[network])
     const currentNode = node.derivePath(path)
     return {
       parentXpriv: xpriv,
       path: path,
-      xpriv: currentNode.toBase58(),
-      xpub: currentNode.neutered().toBase58(),
+      xpriv: currentNode.toBase58(), // BIP32 Extended Private Key
+      xpub: currentNode.neutered().toBase58(), // BIP32 Extended Public Key
       address: currentNode.keyPair.getAddress(),
       wif: currentNode.keyPair.toWIF(),
       privateKey: currentNode.keyPair.d.toHex(),
@@ -375,85 +411,22 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
   }
 
   /**
-   * 由私钥和index推导出下级wif
-   * @param xpriv
-   * @param index
-   * @param network
-   */
-  deriveWifByXprivIndex(xpriv, index, network = 'testnet') {
-
-    const node = this._bitcoin.HDNode.fromBase58(xpriv, this._bitcoin.networks[network])
-    return node.derive(index).keyPair.toWIF()
-  }
-
-  /**
-   * 由私钥和path推导出wif
-   * @param xpriv
-   * @param path
-   * @param network
-   */
-  deriveWifByXprivPath(xpriv, path, network = 'testnet') {
-
-    const node = this._bitcoin.HDNode.fromBase58(xpriv, this._bitcoin.networks[network])
-    const subNode = node.derivePath(path)
-    return subNode.keyPair.toWIF()
-  }
-
-  /**
-   * 由公钥和path推导出公钥
+   * 使用 xpub 推导，不能推到 hardened address
    * @param xpub
    * @param path
    * @param network
+   * @returns {{path: *, xpub: *, chainCode: *, address: *, publicKey: *}}
    */
-  deriveXpubByXpubPath(xpub, path, network = 'testnet') {
-
+  deriveAllByXpubPath(xpub, path, network = 'testnet') {
     const node = this._bitcoin.HDNode.fromBase58(xpub, this._bitcoin.networks[network]).neutered()
-    const subNode = node.derivePath(path)
-    return subNode.neutered().toBase58()
-  }
-
-  /**
-   * 由公钥和path推导出address
-   * @param xpub
-   * @param path
-   * @param network
-   * @returns {*}
-   */
-  deriveAddressByXpubPath(xpub, path, network = 'testnet') {
-
-    const node = this._bitcoin.HDNode.fromBase58(xpub, this._bitcoin.networks[network]).neutered()
-    const subNode = node.derivePath(path)
-    return subNode.getAddress()
-  }
-
-  /**
-   * 由公钥和path区间推导出多个地址
-   * @param xpub
-   * @param pathSpan
-   * @param network
-   * @returns {Promise.<Array>}
-   */
-  async deriveAddressesByXpubPath(xpub, pathSpan, network = 'testnet') {
-    // logger.error(arguments)
-    const pos = pathSpan.lastIndexOf('/')
-    const pre = pathSpan.substring(0, pos + 1)
-    const span = pathSpan.substring(pos + 1, pathSpan.length)
-    const start = parseInt(span.split('~')[0]), end = parseInt(span.split('~')[1])
-    // logger.error(start)
-    const results = []
-    const ProgressBar = require('../progress_bar').default
-    const pb = new ProgressBar('生成进度', 50, end - start)
-    for (let i = start; i < end; i++) {
-      const path = `${pre}${i}`
-      const address = this.getAddressFromXpubByPath(xpub, path, network)
-      results.push({
-        path: path,
-        address: address
-      })
-      pb.render({completed: i - start})
+    const currentNode = node.derivePath(path).neutered()
+    return {
+      path,
+      xpub: currentNode.toBase58(),
+      chainCode: currentNode.chainCode.toHexString(false),
+      address: currentNode.keyPair.getAddress(),
+      publicKey: currentNode.keyPair.getPublicKeyBuffer().toHexString(false)
     }
-    pb.render({completed: end - start})
-    return results
   }
 
   /**
@@ -465,7 +438,7 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
    * @param fee
    * @returns {Promise.<Array>}
    */
-  async constructTargets(utxos, targetAddress, outputMinAmount, outputMaxNum, fee) {
+  constructTargets(utxos, targetAddress, outputMinAmount, outputMaxNum, fee) {
     const targets = []
     fee = fee.toString()
     outputMinAmount = outputMinAmount.toString()
@@ -510,7 +483,7 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
     return targets
   }
 
-  async getTransactionfromHex(txHex) {
+  getTransactionfromHex(txHex) {
     // 未签名的txHex将取不到input
     return this._bitcoin.Transaction.fromHex(txHex)
   }
@@ -526,7 +499,7 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
    * @param version {number}
    * @returns {Promise.<*>}
    */
-  async buildTransaction(utxos, targets, fee, changeAddress, network = 'testnet', sign = true, version = 2) {
+  buildTransaction(utxos, targets, fee, changeAddress, network = 'testnet', sign = true, version = 2) {
     // logger.error(arguments)
     const txBuilder = new this._bitcoin.TransactionBuilder(this._bitcoin.networks[network], 3000)
     txBuilder.setVersion(version)
@@ -599,7 +572,7 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
     let buildedTx = null
     if (sign) {
       // 签名
-      buildedTx = await this._signUtxos(txBuilder, utxos, network)
+      buildedTx = this._signUtxos(txBuilder, utxos, network)
     } else {
       buildedTx = txBuilder.buildIncomplete()
     }
@@ -620,7 +593,7 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
    * @param network
    * @returns {{txId: *, transaction: *}}
    */
-  async decodeTxHex(txHex, network = 'testnet') {
+  decodeTxHex(txHex, network = 'testnet') {
     const tx = this._bitcoin.Transaction.fromHex(txHex)
     let inputs = [], outputs = [], outputAmount = '0'
     for (let input of tx.ins) {
@@ -671,7 +644,7 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
    * @param publicKeys 每个utxo的公钥
    * @returns {Promise<void>}
    */
-  async verifySignatures(txHex, publicKeys) {
+  verifySignatures(txHex, publicKeys) {
     const keyPairs = publicKeys.map((publicKey) => {
       return this._bitcoin.ECPair.fromPublicKeyBuffer(Buffer.from(publicKey, 'hex'))
     })
@@ -702,9 +675,9 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
    * @param network
    * @returns {Promise<void>}
    */
-  async signTxHex(txHex, utxos, network = 'testnet') {
+  signTxHex(txHex, utxos, network = 'testnet') {
     const txBuilder = this._bitcoin.TransactionBuilder.fromTransaction(this._bitcoin.Transaction.fromHex(txHex), this._bitcoin.networks[network])
-    const buildedTx = await this._signUtxos(txBuilder, utxos, network)
+    const buildedTx = this._signUtxos(txBuilder, utxos, network)
     let inputs = [], outputs = [], outputAmount = '0'
     for (let input of buildedTx.ins) {
       inputs.push({
@@ -738,7 +711,7 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
     }
   }
 
-  async _signUtxos(txBuilder, utxos, network) {
+  _signUtxos(txBuilder, utxos, network) {
     // logger.error(arguments)
     utxos.map((utxo, index) => {
       let {wif, type = 'p2pkh', balance, pubkeys} = utxo
