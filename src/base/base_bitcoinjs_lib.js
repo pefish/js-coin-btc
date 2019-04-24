@@ -661,11 +661,18 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
     }
   }
 
+  /**
+   * 对utxo签名
+   * @param txBuilder
+   * @param utxos {array} wif [type] [balance] [pubkeys] [m]
+   * @param network
+   * @returns {*|Transaction}
+   * @private
+   */
   _signUtxos(txBuilder, utxos, network) {
     // logger.error(arguments)
     utxos.map((utxo, index) => {
-      let {wif, type = 'p2pkh', balance, pubkeys} = utxo
-      balance = (balance === undefined ? this.btcToSatoshi(utxo['amount']) : balance)
+      let {wif, type = 'p2pkh', balance, pubkeys, m} = utxo
       if (type === 'p2pkh') {
         const keyPair = this._bitcoin.ECPair.fromWIF(wif, network)
         txBuilder.sign(index, keyPair)
@@ -683,8 +690,8 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
         const pubKeysBuffer = pubkeys.map((pubkey) => {
           return Buffer.from(pubkey, 'hex')
         })
-        const p2sh = this._bitcoin.payments.p2sh({
-          redeem: this._bitcoin.payments.p2ms({ m: keyPairs.length, pubkeys: pubKeysBuffer, network }),
+        const p2sh = this._bitcoin.payments.p2wsh({
+          redeem: this._bitcoin.payments.p2ms({ m: m || keyPairs.length, pubkeys: pubKeysBuffer, network }),
           network
         })
         for (let keyPair of keyPairs) {
@@ -698,11 +705,11 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
           return Buffer.from(pubkey, 'hex')
         })
         const p2sh = this._bitcoin.payments.p2sh({
-          redeem: this._bitcoin.payments.p2ms({ m: keyPairs.length, pubkeys: pubKeysBuffer, network }),
+          redeem: this._bitcoin.payments.p2ms({ m: m || keyPairs.length, pubkeys: pubKeysBuffer, network }),
           network
         })
         for (let keyPair of keyPairs) {
-          txBuilder.sign(index, keyPair, p2sh.redeem.output, null, balance.toNumber())
+          txBuilder.sign(index, keyPair, p2sh.redeem.output)
         }
       } else if (type === 'p2sh(p2wsh(p2ms))') {
         const keyPairs = wif.map((wif_) => {
@@ -712,7 +719,7 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
           return Buffer.from(pubkey, 'hex')
         })
         const p2wsh = this._bitcoin.payments.p2wsh({
-          redeem: this._bitcoin.payments.p2ms({ m: keyPairs.length, pubkeys: pubKeysBuffer, network }),
+          redeem: this._bitcoin.payments.p2ms({ m: m || keyPairs.length, pubkeys: pubKeysBuffer, network }),
           network
         })
         const p2sh = this._bitcoin.payments.p2sh({ redeem: p2wsh, network })

@@ -9,7 +9,7 @@ class BitcoinWalletHelper extends BaseBitcoinjsLib {
 
   constructor () {
     super()
-    this._bitcoin = require('bitcoinjs-lib')
+    this._bitcoin = require('btc-bitcoinjs-lib')
   }
 }
 
