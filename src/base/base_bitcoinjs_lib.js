@@ -32,24 +32,10 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
     return bip39Lib.validateMnemonic(mnemonic)
   }
 
-  /**
-   * 由种子得到主密钥
-   * @param seedBuffer
-   * @param network
-   * @returns {{seed: string, xpriv: *, xpub: *, address: *, chainCode: *, privateKey, publicKey: *, wif: string|*}}
-   */
-  getMasterPairBySeedBuffer (seedBuffer, network = 'testnet') {
-    const node = this._bitcoin.HDNode.fromSeedBuffer(seedBuffer, this._bitcoin.networks[network])
-    return {
-      seed: seedBuffer.toString('hex'),
-      xpriv: node.toBase58(),
-      xpub: node.neutered().toBase58(),
-      address: node.keyPair.getAddress(),
-      chainCode: node.chainCode.toHexString(false),
-      privateKey: node.keyPair.d.toHex(),
-      publicKey: node.getPublicKeyBuffer().toHexString(false),
-      wif: node.keyPair.toWIF()
-    }
+  getSeedByMnemonic (mnemonic, pass = '') {
+    const bip39Lib = require('bip39')
+    const seed = bip39Lib.mnemonicToSeedSync(mnemonic, pass)
+    return seed.toHexString(false)
   }
 
   /**
@@ -63,20 +49,16 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
     const bip39Lib = require('bip39')
     const seed = bip39Lib.mnemonicToSeedSync(mnemonic, pass) // 种子buffer
 
-    // 或者
-    // const bip32Lib = require('bip32')
-    // const root = bip32Lib.fromSeed(seed, this._bitcoin.networks[network])
-    // return {
-    //   seed: seed.toString('hex'),
-    //   xpriv: root.toBase58(),
-    //   xpub: root.neutered().toBase58()
-    // }
-
-    const node = this._bitcoin.HDNode.fromSeedBuffer(seed, this._bitcoin.networks[network])  // node里面才是主公钥和主私钥
+    const bip32Lib = require('bip32')
+    const node = bip32Lib.fromSeed(seed, this._bitcoin.networks[network])
     return {
-      seed: seed.toString('hex'),
+      seed: seed.toHexString(false),
       xpriv: node.toBase58(),  // 主私钥, depth为0(BIP32 Root Key)
-      xpub: node.neutered().toBase58()  // 主公钥, neutered是去掉私钥价值
+      xpub: node.neutered().toBase58(),  // 主公钥, neutered是去掉私钥价值
+      chainCode: node.chainCode.toHexString(false),
+      privateKey: node.privateKey.toHexString(false),
+      publicKey: node.publicKey.toHexString(false),
+      wif: node.toWIF()
     }
   }
 
@@ -136,7 +118,8 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
    * @param network
    */
   getNodeFromXpub (xpub, network = 'testnet') {
-    return this._bitcoin.HDNode.fromBase58(xpub, this._bitcoin.networks[network]).neutered()
+    const bip32Lib = require('bip32')
+    return bip32Lib.fromBase58(xpub, this._bitcoin.networks[network]).neutered()
   }
 
   /**
@@ -145,55 +128,48 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
    * @param network
    */
   getNodeFromXpriv (xpriv, network = 'testnet') {
-    return this._bitcoin.HDNode.fromBase58(xpriv, this._bitcoin.networks[network])
+    const bip32Lib = require('bip32')
+    return bip32Lib.fromBase58(xpriv, this._bitcoin.networks[network])
   }
 
-  /**
-   * xpriv->xpub
-   * @param xpriv
-   * @param network
-   */
-  xprivToXpub (xpriv, network = 'testnet') {
-    const node = this._bitcoin.HDNode.fromBase58(xpriv, this._bitcoin.networks[network])
-    return node.neutered().toBase58()
-  }
-
-  getAddressFromXpub(xpub, network = 'testnet') {
-    const keyPair = this._bitcoin.HDNode.fromBase58(xpub, this._bitcoin.networks[network]).neutered().keyPair
-    return keyPair.getAddress()
+  _parseNetwork (network) {
+    if (network === `testnet`) {
+      return this._bitcoin.networks[`testnet`]
+    } else if (network === `mainnet`) {
+      return this._bitcoin.networks[`bitcoin`]
+    } else if (network === `regtest`) {
+      return this._bitcoin.networks[`regtest`]
+    } else {
+      throw new ErrorHelper(`network error`)
+    }
   }
 
   getAllFromXpub(xpub, network = 'testnet') {
-    const node = this._bitcoin.HDNode.fromBase58(xpub, this._bitcoin.networks[network]).neutered()
+    const node = this.getNodeFromXpub(xpub, network)
     return {
-      address: node.keyPair.getAddress(),
       chainCode: node.chainCode.toHexString(false),
-      publicKey: node.keyPair.getPublicKeyBuffer().toHexString(false)
+      publicKey: node.publicKey.toHexString(false)
+    }
+  }
+
+  getAllFromWif(wif, network = 'testnet') {
+    network = this._parseNetwork(network)
+    const ecPair = this._bitcoin.ECPair.fromWIF(wif, network)
+    return {
+      privateKey: ecPair.privateKey.toHexString(false),
+      publicKey: ecPair.publicKey.toHexString(false),
     }
   }
 
   getAllFromXpriv(xpriv, network = 'testnet') {
-    const currentNode = this._bitcoin.HDNode.fromBase58(xpriv, this._bitcoin.networks[network])
+    const node = this.getNodeFromXpriv(xpriv, network)
     return {
-      xpriv: currentNode.toBase58(),
-      xpub: currentNode.neutered().toBase58(),
-      address: currentNode.keyPair.getAddress(),
-      wif: currentNode.keyPair.toWIF(),
-      privateKey: currentNode.keyPair.d.toHex(),
-      publicKey: currentNode.keyPair.getPublicKeyBuffer().toHexString(false)
+      xpub: node.neutered().toBase58(),
+      wif: node.toWIF(),
+      privateKey: node.privateKey.toHexString(false),
+      publicKey: node.publicKey.toHexString(false),
+      chainCode: node.chainCode.toHexString(false),
     }
-  }
-
-  /**
-   * wif到address  P2PKH
-   * @param wif
-   * @param type
-   * @param network
-   * @returns {*}
-   */
-  getAddressFromWif(wif, type = 'p2pkh', network = 'testnet') {
-    const keyPair = this._bitcoin.ECPair.fromWIF(wif, this._bitcoin.networks[network])
-    return this.getAddressFromKeyPair(keyPair, type, network)
   }
 
   /**
@@ -204,11 +180,11 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
    */
   isAddress(address, network = 'testnet') {
     return this.verifyAddressType(address, 'p2pkh', network) ||
-      this.verifyAddressType(address, 'p2sh', network) ||
-      this.verifyAddressType(address, 'p2sh(p2wpkh)', network) ||
-      this.verifyAddressType(address, 'p2sh(multisig)', network) ||
       this.verifyAddressType(address, 'p2wpkh', network) ||
-      this.verifyAddressType(address, 'p2wsh', network)
+      this.verifyAddressType(address, 'p2sh(p2wpkh)', network) ||
+      this.verifyAddressType(address, 'p2wsh(p2ms)', network) ||
+      this.verifyAddressType(address, 'p2sh(p2ms)', network) ||
+      this.verifyAddressType(address, 'p2sh(p2wsh(p2ms))', network)
   }
 
   /**
@@ -217,115 +193,133 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
    * @param network
    * @returns {*|string}
    */
-  getAddressType(address, network = 'testnet') {
-    return this._bitcoin.address.getAddressType(address, this._bitcoin.networks[network])
+  getAddressType (address, network = 'testnet') {
+    network = this._parseNetwork(network)
+    let decode
+    try {
+      decode = this._bitcoin.address.fromBase58Check(address)
+    } catch (e) {}
+    if (decode && decode.version === network.pubKeyHash) {
+      return 'p2pkh'
+    }
+    if (decode && decode.version === network.scriptHash) {
+      return ['p2sh(p2wpkh)', 'p2sh(p2ms)', 'p2sh(p2wsh(p2ms))']
+    }
+    try {
+      decode = this._bitcoin.address.fromBech32(address)
+    } catch (e) {}
+    if (decode && decode.version === 0 && decode.data.length === 20) {
+      return 'p2wpkh'
+    }
+    if (decode && decode.version === 0 && decode.data.length === 32) {
+      return 'p2wsh(p2ms)'
+    }
+    return null
   }
 
   /**
    * 校验地址的类型
    * @param address
-   * @param type
+   * @param type {string} p2pkh|p2wpkh|p2sh(p2wpkh)|p2wsh(p2ms)|p2sh(p2ms)|p2sh(p2wsh(p2ms))
    * @param network
    * @returns {*|boolean}
    */
-  verifyAddressType(address, type = 'p2pkh', network = 'testnet') {
-    return this._bitcoin.address.verifyAddressType(address, type, this._bitcoin.networks[network])
-  }
-
-  getRedeemScriptBufferFromWif(wif, network = 'testnet') {
-    const pubKeyBuffer = this._bitcoin.ECPair.fromWIF(wif, this._bitcoin.networks[network]).getPublicKeyBuffer()
-    const pubKeyHash = this._bitcoin.crypto.hash160(pubKeyBuffer)
-
-    return this._bitcoin.script.witnessPubKeyHash.output.encode(pubKeyHash)
-  }
-
-  getAddressFromKeyPair(keyPair, type = 'p2pkh', network = 'testnet') {
-    return this.getAddressFromPublicKey(this.getPublicKeyFromKeyPair(keyPair), type, network)
+  verifyAddressType (address, type = 'p2pkh', network = 'testnet') {
+    network = this._parseNetwork(network)
+    let decode
+    if (type === 'p2pkh') {
+      try {
+        decode = this._bitcoin.address.fromBase58Check(address)
+      } catch (e) {}
+      if (decode) {
+        return decode.version === network.pubKeyHash
+      }
+    } else if (type === 'p2sh(p2wpkh)' || type === 'p2sh(p2ms)' || type === 'p2sh(p2wsh(p2ms))') {
+      try {
+        decode = this._bitcoin.address.fromBase58Check(address)
+      } catch (e) {}
+      if (decode) {
+        return decode.version === network.scriptHash
+      }
+    } else if (type === 'p2wpkh') {
+      try {
+        decode = this._bitcoin.address.fromBech32(address)
+      } catch (e) {}
+      if (decode) {
+        if (decode.prefix !== network.bech32) throw new ErrorHelper(address + ' has an invalid prefix')
+        if (decode.version === 0) {
+          return decode.data.length === 20
+        }
+      }
+    } else if (type === 'p2wsh(p2ms)') {
+      try {
+        decode = this._bitcoin.address.fromBech32(address)
+      } catch (e) {}
+      if (decode) {
+        if (decode.prefix !== network.bech32) throw new ErrorHelper(address + ' has an invalid prefix')
+        if (decode.version === 0) {
+          return decode.data.length === 32
+        }
+      }
+    } else {
+      throw new ErrorHelper(`${type} type not exists`)
+    }
+    return false
   }
 
   getAddressFromPublicKey(publicKey, type = 'p2pkh', network = 'testnet') {
-    network = this._bitcoin.networks[network]
+    network = this._parseNetwork(network)
     if (type === 'p2pkh') {
-      // 常规地址，已测试
-      const keyPair = this._bitcoin.ECPair.fromPublicKeyBuffer(publicKey.hexToBuffer(), network)
-      return keyPair.getAddress()
+      // 常规地址
+      return this._bitcoin.payments.p2pkh({
+        pubkey: publicKey.hexToBuffer(),
+        network
+      })[`address`]
     } else if (type === 'p2wpkh') {
-      // bitcoind的bech32参数(native segwit)
-      const pubKeyHash = this._bitcoin.crypto.hash160(publicKey.hexToBuffer())
-      const scriptPubKey = this._bitcoin.script.witnessPubKeyHash.output.encode(pubKeyHash)
-      return this._bitcoin.address.fromOutputScript(scriptPubKey, network)
-    } else if (type === 'p2wsh') {
-      const pubKeyHash = this._bitcoin.crypto.sha256(publicKey.hexToBuffer())
-      const redeemScript = this._bitcoin.script.witnessScriptHash.output.encode(pubKeyHash)
-      return this._bitcoin.address.fromOutputScript(redeemScript, network)
-    } else if (type === 'p2sh') {
-      const pubKeyHash = this._bitcoin.crypto.hash160(publicKey.hexToBuffer())
-      const scriptPubKey = this._bitcoin.script.scriptHash.output.encode(this._bitcoin.crypto.hash160(pubKeyHash))
-      return this._bitcoin.address.fromOutputScript(scriptPubKey, network)
+      return this._bitcoin.payments.p2wpkh({
+        pubkey: publicKey.hexToBuffer(),
+        network
+      })[`address`]
     } else if (type === 'p2sh(p2wpkh)') {
       // 这就是segwit地址，bitcoind的p2sh-segwit参数(p2sh-segwit)
-      const pubKeyHash = this._bitcoin.crypto.hash160(publicKey.hexToBuffer())
-      const redeemScriptBuffer = this._bitcoin.script.witnessPubKeyHash.output.encode(pubKeyHash)
-      const scriptPubKey = this._bitcoin.script.scriptHash.output.encode(this._bitcoin.crypto.hash160(redeemScriptBuffer))
-      return this._bitcoin.address.fromOutputScript(scriptPubKey, network)
-    } else if (type === 'p2sh(p2wsh)') {
-      const pubKeyHash = this._bitcoin.crypto.sha256(publicKey.hexToBuffer())
-      const redeemScriptBuffer = this._bitcoin.script.witnessScriptHash.output.encode(pubKeyHash)
-      const scriptPubKey = this._bitcoin.script.scriptHash.output.encode(this._bitcoin.crypto.hash160(redeemScriptBuffer))
-      return this._bitcoin.address.fromOutputScript(scriptPubKey, network)
-    } else if (type === 'p2sh_multisig') {
+      return this._bitcoin.payments.p2sh({
+        redeem: this._bitcoin.payments.p2wpkh({ pubkey: publicKey.hexToBuffer(), network }),
+        network
+      })[`address`]
+    } else if (type === 'p2wsh(p2ms)') {
       const {pubkeys, m} = publicKey
       const pubKeysBuffer = pubkeys.map((hex) => {
         return Buffer.from(hex, 'hex')
       })
-      const redeemScript = this._bitcoin.script.multisig.output.encode(m, pubKeysBuffer) // 至少需要m个签名才能消费
-      const scriptPubKey = this._bitcoin.script.scriptHash.output.encode(this._bitcoin.crypto.hash160(redeemScript))
-      return this._bitcoin.address.fromOutputScript(scriptPubKey, network)
-    } else if (type === 'p2sh(p2wpkh)_multisig') {
+      return this._bitcoin.payments.p2wsh({
+        redeem: this._bitcoin.payments.p2ms({ m, pubkeys: pubKeysBuffer, network }),
+        network
+      })[`address`]
+    } else if (type === 'p2sh(p2wsh(p2ms))') {
       const {pubkeys, m} = publicKey
       const pubKeysBuffer = pubkeys.map((hex) => {
         return Buffer.from(hex, 'hex')
       })
-      const witnessScript = this._bitcoin.script.multisig.output.encode(m, pubKeysBuffer) // 至少需要m个签名才能消费
-
-      const redeemScriptBuffer = this._bitcoin.script.witnessPubKeyHash.output.encode(witnessScript)
-      const scriptPubKey = this._bitcoin.script.scriptHash.output.encode(this._bitcoin.crypto.hash160(redeemScriptBuffer))
-      return this._bitcoin.address.fromOutputScript(scriptPubKey, network)
-    } else if (type === 'p2sh(p2wsh)_multisig') {
+      return this._bitcoin.payments.p2sh({
+        redeem: this._bitcoin.payments.p2wsh({
+          redeem: this._bitcoin.payments.p2ms({ m, pubkeys: pubKeysBuffer, network }),
+          network
+        }),
+        network
+      })[`address`]
+    } else if (type === 'p2sh(p2ms)') {
+      // 网上一般用这个
       const {pubkeys, m} = publicKey
-      const pubKeysBuffer = pubkeys.map((hex) => {
+      const pubKeysBuffer = pubkeys.map((hex) => {  // pubkeys顺序不一样，生成的地址也不一样
         return Buffer.from(hex, 'hex')
       })
-      const witnessScript = this._bitcoin.script.multisig.output.encode(m, pubKeysBuffer) // 至少需要m个签名才能消费
-
-      const witnessScriptHash = this._bitcoin.crypto.sha256(witnessScript)
-      const redeemScript = this._bitcoin.script.witnessScriptHash.output.encode(witnessScriptHash)
-
-      const scriptPubKey = this._bitcoin.script.scriptHash.output.encode(this._bitcoin.crypto.hash160(redeemScript))
-      return this._bitcoin.address.fromOutputScript(scriptPubKey, network)
+      return this._bitcoin.payments.p2sh({
+        redeem: this._bitcoin.payments.p2ms({ m, pubkeys: pubKeysBuffer, network }),
+        network
+      })[`address`]
     } else {
       throw new ErrorHelper('type指定错误')
     }
-  }
-
-  /**
-   * 从私钥得到wif
-   * 由左32位(即privateKey)和wif标记(即版本，每个网络特定)以及checksum进行base58-check编码
-   * @param xpriv
-   * @param network
-   */
-  getWifFromXpriv(xpriv, network = 'testnet') {
-    const keyPair = this._bitcoin.HDNode.fromBase58(xpriv, this._bitcoin.networks[network]).keyPair
-    return keyPair.toWIF()
-  }
-
-  getKeyPairFromWif(wif, network = 'testnet') {
-    return this._bitcoin.ECPair.fromWIF(wif, this._bitcoin.networks[network])
-  }
-
-  getPrivateKeyFromXpriv(xpriv, network = 'testnet') {
-    const keyPair = this._bitcoin.HDNode.fromBase58(xpriv, this._bitcoin.networks[network]).keyPair
-    return keyPair.d.toHex()
   }
 
   /**
@@ -346,48 +340,6 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
     return CryptUtil.sha256(mintStr)
   }
 
-  getPublicKeyFromWif(wif, network = 'testnet') {
-    const keyPair = this.getKeyPairFromWif(wif, network)
-    return keyPair.getPublicKeyBuffer().toHexString(false)
-  }
-
-  getPublicKeyFromKeyPair(keyPair, network = 'testnet') {
-    return keyPair.getPublicKeyBuffer().toHexString(false)
-  }
-
-  getPublicKeyFromPrivateKey(privateKey, compress = true, network = 'testnet') {
-    const keyPair = new this._bitcoin.ECPair(BigInteger.fromBuffer(privateKey.hexToBuffer()), null, {
-      compressed: compress,
-      network: this._bitcoin.networks[network]
-    })
-    return keyPair.getPublicKeyBuffer().toHexString(false)
-  }
-
-  /**
-   * 由私钥得到ecpair
-   * @param xpriv
-   * @param network
-   * @returns {*}
-   */
-  getKeyPairFromXpriv(xpriv, network = 'testnet') {
-
-    return this._bitcoin.HDNode.fromBase58(xpriv, this._bitcoin.networks[network]).keyPair
-  }
-
-  /**
-   * 根据ecpair(左32位私钥得到的)得到地址、公钥wif、wif
-   * @param keyPair
-   * @returns {{address: string, wif: string}}
-   */
-  getAllFromKeyPair(keyPair) {
-    return {
-      address: keyPair.getAddress(),
-      wif: keyPair.toWIF(),
-      privateKey: keyPair.d.toHex(),
-      publicKey: keyPair.getPublicKeyBuffer().toHexString(false)
-    }
-  }
-
   /**
    * 由私钥和path推导出下级节点的所有信息，path中带有'的地址称为hardened address
    * @param xpriv
@@ -396,17 +348,16 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
    * @returns {{parentXpriv: *, index: *, xpriv, xpub, address: *, wif}}
    */
   deriveAllByXprivPath(xpriv, path, network = 'testnet') {
-    const node = this._bitcoin.HDNode.fromBase58(xpriv, this._bitcoin.networks[network])
+    const node = this.getNodeFromXpriv(xpriv, network)
     const currentNode = node.derivePath(path)
     return {
-      parentXpriv: xpriv,
       path: path,
       xpriv: currentNode.toBase58(), // BIP32 Extended Private Key
       xpub: currentNode.neutered().toBase58(), // BIP32 Extended Public Key
-      address: currentNode.keyPair.getAddress(),
-      wif: currentNode.keyPair.toWIF(),
-      privateKey: currentNode.keyPair.d.toHex(),
-      publicKey: currentNode.keyPair.getPublicKeyBuffer().toHexString(false)
+      wif: currentNode.toWIF(),
+      chainCode: currentNode.chainCode.toHexString(false),
+      privateKey: currentNode.privateKey.toHexString(false),
+      publicKey: currentNode.publicKey.toHexString(false)
     }
   }
 
@@ -418,14 +369,12 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
    * @returns {{path: *, xpub: *, chainCode: *, address: *, publicKey: *}}
    */
   deriveAllByXpubPath(xpub, path, network = 'testnet') {
-    const node = this._bitcoin.HDNode.fromBase58(xpub, this._bitcoin.networks[network]).neutered()
+    const node = this.getNodeFromXpub(xpub, network)
     const currentNode = node.derivePath(path).neutered()
     return {
       path,
-      xpub: currentNode.toBase58(),
       chainCode: currentNode.chainCode.toHexString(false),
-      address: currentNode.keyPair.getAddress(),
-      publicKey: currentNode.keyPair.getPublicKeyBuffer().toHexString(false)
+      publicKey: currentNode.publicKey.toHexString(false)
     }
   }
 
@@ -483,7 +432,7 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
     return targets
   }
 
-  getTransactionfromHex(txHex) {
+  getTransactionFromHex(txHex) {
     // 未签名的txHex将取不到input
     return this._bitcoin.Transaction.fromHex(txHex)
   }
@@ -500,8 +449,8 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
    * @returns {Promise.<*>}
    */
   buildTransaction(utxos, targets, fee, changeAddress, network = 'testnet', sign = true, version = 2) {
-    // logger.error(arguments)
-    const txBuilder = new this._bitcoin.TransactionBuilder(this._bitcoin.networks[network], 3000)
+    network = this._parseNetwork(network)
+    const txBuilder = new this._bitcoin.TransactionBuilder(network, 3000)
     txBuilder.setVersion(version)
     let totalUtxoBalance = '0'
 
@@ -676,8 +625,9 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
    * @returns {Promise<void>}
    */
   signTxHex(txHex, utxos, network = 'testnet') {
-    const txBuilder = this._bitcoin.TransactionBuilder.fromTransaction(this._bitcoin.Transaction.fromHex(txHex), this._bitcoin.networks[network])
-    const buildedTx = this._signUtxos(txBuilder, utxos, network)
+    const realNetwork = this._parseNetwork(network)
+    const txBuilder = this._bitcoin.TransactionBuilder.fromTransaction(this._bitcoin.Transaction.fromHex(txHex), realNetwork)
+    const buildedTx = this._signUtxos(txBuilder, utxos, realNetwork)
     let inputs = [], outputs = [], outputAmount = '0'
     for (let input of buildedTx.ins) {
       inputs.push({
@@ -717,37 +667,57 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
       let {wif, type = 'p2pkh', balance, pubkeys} = utxo
       balance = (balance === undefined ? this.btcToSatoshi(utxo['amount']) : balance)
       if (type === 'p2pkh') {
-        // P2PKH地址
-        const keyPair = this._bitcoin.ECPair.fromWIF(wif, this._bitcoin.networks[network])
+        const keyPair = this._bitcoin.ECPair.fromWIF(wif, network)
         txBuilder.sign(index, keyPair)
       } else if (type === 'p2sh(p2wpkh)') {
-        // P2SH(P2WPKH)地址
-        const keyPair = this._bitcoin.ECPair.fromWIF(wif, this._bitcoin.networks[network])
-        const redeemScriptBuffer = this.getRedeemScriptBufferFromWif(wif, network)
+        const keyPair = this._bitcoin.ECPair.fromWIF(wif, network)
+        const redeemScriptBuffer = this._bitcoin.payments.p2sh({
+          redeem: this._bitcoin.payments.p2wpkh({ pubkey: keyPair.publicKey, network }),
+          network
+        })[`redeem`][`output`]
         txBuilder.sign(index, keyPair, redeemScriptBuffer, null, balance.toNumber())
-      } else if (type === 'p2sh_multisig') {
-        // 多签名，P2SH(multisig)地址
+      } else if (type === 'p2wsh(p2ms)') {
         const keyPairs = wif.map((wif_) => {
-          return this._bitcoin.ECPair.fromWIF(wif_, this._bitcoin.networks[network])
+          return this._bitcoin.ECPair.fromWIF(wif_, network)
         })
         const pubKeysBuffer = pubkeys.map((pubkey) => {
           return Buffer.from(pubkey, 'hex')
         })
-        const redeemScriptBuffer = this._bitcoin.script.multisig.output.encode(1, pubKeysBuffer)
+        const p2sh = this._bitcoin.payments.p2sh({
+          redeem: this._bitcoin.payments.p2ms({ m: keyPairs.length, pubkeys: pubKeysBuffer, network }),
+          network
+        })
         for (let keyPair of keyPairs) {
-          txBuilder.sign(index, keyPair, redeemScriptBuffer)
+          txBuilder.sign(index, keyPair, p2sh.redeem.output)
         }
-      } else if (type === 'p2sh(p2wsh)_multisig') {
+      } else if (type === 'p2sh(p2ms)') {
         const keyPairs = wif.map((wif_) => {
-          return this._bitcoin.ECPair.fromWIF(wif_, this._bitcoin.networks[network])
+          return this._bitcoin.ECPair.fromWIF(wif_, network)
         })
         const pubKeysBuffer = pubkeys.map((pubkey) => {
           return Buffer.from(pubkey, 'hex')
         })
-        const witnessScriptBuffer = this._bitcoin.script.multisig.output.encode(keyPairs.length, pubKeysBuffer)
-        const redeemScriptBuffer = this._bitcoin.script.witnessScriptHash.output.encode(this._bitcoin.crypto.sha256(witnessScriptBuffer))
+        const p2sh = this._bitcoin.payments.p2sh({
+          redeem: this._bitcoin.payments.p2ms({ m: keyPairs.length, pubkeys: pubKeysBuffer, network }),
+          network
+        })
         for (let keyPair of keyPairs) {
-          txBuilder.sign(index, keyPair, redeemScriptBuffer, null, balance.toNumber(), witnessScriptBuffer)
+          txBuilder.sign(index, keyPair, p2sh.redeem.output, null, balance.toNumber())
+        }
+      } else if (type === 'p2sh(p2wsh(p2ms))') {
+        const keyPairs = wif.map((wif_) => {
+          return this._bitcoin.ECPair.fromWIF(wif_, network)
+        })
+        const pubKeysBuffer = pubkeys.map((pubkey) => {
+          return Buffer.from(pubkey, 'hex')
+        })
+        const p2wsh = this._bitcoin.payments.p2wsh({
+          redeem: this._bitcoin.payments.p2ms({ m: keyPairs.length, pubkeys: pubKeysBuffer, network }),
+          network
+        })
+        const p2sh = this._bitcoin.payments.p2sh({ redeem: p2wsh, network })
+        for (let keyPair of keyPairs) {
+          txBuilder.sign(index, keyPair, p2sh.redeem.output, null, balance.toNumber(), p2wsh.redeem.output)
         }
       } else {
         throw new ErrorHelper('utxo中type指定错误')

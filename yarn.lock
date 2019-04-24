@@ -2,6 +2,11 @@
 # yarn lockfile v1
 
 
+"@types/node@10.12.18":
+  version "10.12.18"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.18.tgz#1d3ca764718915584fcd9f6344621b7672665c67"
+  integrity sha512-fh+pAqt4xRzPfqA6eh3Z2y6fyZavRIumvjhaCL753+TVkGKGhpPeyrJG2JftD0T9q4GF00KjefsQ+PQNDdWQaQ==
+
 "@types/node@11.11.6":
   version "11.11.6"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-11.11.6.tgz#df929d1bb2eee5afdda598a41930fe50b43eaa6a"
@@ -609,6 +614,19 @@ bip32@^1.0.4:
     typeforce "^1.11.5"
     wif "^2.0.6"
 
+bip32@^2.0.0:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/bip32/-/bip32-2.0.2.tgz#7f131b84fb2b84cf8a52aa206def6a8f1037f82b"
+  integrity sha512-Wws0wBYp+KViCTJLLalmOUhefd1puJslme6ks1HPRuEEXGA28HNRVcx6aIGnH0VNYr/NqoUMYf/QakCjbXcElQ==
+  dependencies:
+    "@types/node" "10.12.18"
+    bs58check "^2.1.1"
+    create-hash "^1.2.0"
+    create-hmac "^1.1.7"
+    tiny-secp256k1 "^1.0.0"
+    typeforce "^1.11.5"
+    wif "^2.0.6"
+
 bip39@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/bip39/-/bip39-3.0.1.tgz#7e8831a36a20366a9216ce5b852dccc28cbf8332"
@@ -640,7 +658,7 @@ bitcoin-core@^2.0.0:
     semver "^5.1.0"
     standard-error "^1.1.0"
 
-bitcoin-ops@^1.3.0:
+bitcoin-ops@^1.3.0, bitcoin-ops@^1.4.0:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/bitcoin-ops/-/bitcoin-ops-1.4.1.tgz#e45de620398e22fd4ca6023de43974ff42240278"
   integrity sha512-pef6gxZFztEhaE9RY9HmWVmiIHqCb2OyS4HPKkpc6CIiiOa3Qmuoylxc5P2EkU3w+5eTSifI9SEZC88idAIGow==
@@ -650,23 +668,23 @@ bitcoin@^3.0.1:
   resolved "https://registry.yarnpkg.com/bitcoin/-/bitcoin-3.0.1.tgz#ff9e0b62a71bbb8adddb34ee2e427dac21c1096f"
   integrity sha1-/54LYqcbu4rd2zTuLkJ9rCHBCW8=
 
-bitcoinjs-lib@^3.3.2:
-  version "3.3.2"
-  resolved "https://registry.yarnpkg.com/bitcoinjs-lib/-/bitcoinjs-lib-3.3.2.tgz#780c9c53ecb1222adb463b58bef26386067b609a"
-  integrity sha512-l5qqvbaK8wwtANPf6oEffykycg4383XgEYdia1rI7/JpGf1jfRWlOUCvx5TiTZS7kyIvY4j/UhIQ2urLsvGkzw==
+bitcoinjs-lib@^5.0.2:
+  version "5.0.2"
+  resolved "https://registry.yarnpkg.com/bitcoinjs-lib/-/bitcoinjs-lib-5.0.2.tgz#21f0321d921def8c0fa2e833c794f584bcebd6ae"
+  integrity sha512-KAixYzzYd1MEDXgSCI37C9pcRccRuKL34S65S3SNQ3EpXhBKUW/pAC17OM8rWwvq0BizSteeAzD9blbOmrViIA==
   dependencies:
+    "@types/node" "10.12.18"
     bech32 "^1.1.2"
-    bigi "^1.4.0"
+    bip32 "^2.0.0"
     bip66 "^1.1.0"
-    bitcoin-ops "^1.3.0"
+    bitcoin-ops "^1.4.0"
     bs58check "^2.0.0"
     create-hash "^1.1.0"
     create-hmac "^1.1.3"
-    ecurve "^1.0.0"
     merkle-lib "^2.0.10"
     pushdata-bitcoin "^1.0.1"
     randombytes "^2.0.1"
-    safe-buffer "^5.0.1"
+    tiny-secp256k1 "^1.0.0"
     typeforce "^1.11.3"
     varuint-bitcoin "^1.0.4"
     wif "^2.0.1"
@@ -744,27 +762,6 @@ bs58check@<3.0.0, bs58check@^2.0.0, bs58check@^2.1.1, bs58check@^2.1.2:
     bs58 "^4.0.0"
     create-hash "^1.1.0"
     safe-buffer "^5.1.2"
-
-btc-bitcoinjs-lib@^3.3.10:
-  version "3.3.10"
-  resolved "https://registry.yarnpkg.com/btc-bitcoinjs-lib/-/btc-bitcoinjs-lib-3.3.10.tgz#c0713c136a55898fc52d9c0715194c74c9f5f8e5"
-  integrity sha512-xQ+1tIhlIOcmToDWIZH4PNJa+oP70eF+DyqZO8neT8QMlAa7mKhrFsv+a7MmuGOMGyVysBKW3+YH90nKY//ljg==
-  dependencies:
-    bech32 "0.0.3"
-    bigi "^1.4.0"
-    bip66 "^1.1.0"
-    bitcoin-ops "^1.3.0"
-    bs58check "^2.0.0"
-    create-hash "^1.1.0"
-    create-hmac "^1.1.3"
-    ecurve "^1.0.0"
-    merkle-lib "^2.0.10"
-    pushdata-bitcoin "^1.0.1"
-    randombytes "^2.0.1"
-    safe-buffer "^5.0.1"
-    typeforce "^1.11.3"
-    varuint-bitcoin "^1.0.4"
-    wif "^2.0.1"
 
 buffer-compare@=1.0.0:
   version "1.0.0"

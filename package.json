@@ -1,6 +1,6 @@
 {
   "name": "js-btc",
-  "version": "0.0.2",
+  "version": "0.1.1",
   "description": "btc tool of js",
   "keywords": [
     "common",
@@ -30,9 +30,8 @@
     "bip39": "^3.0.1",
     "bitcoin": "^3.0.1",
     "bitcoin-core": "^2.0.0",
-    "bitcoinjs-lib": "^3.3.2",
+    "bitcoinjs-lib": "^5.0.2",
     "bitcore-lib": "^0.15.0",
-    "btc-bitcoinjs-lib": "^3.3.10",
     "dashcore-lib": "^8.2.3",
     "ltc-bitcoinjs-lib": "^3.3.10",
     "node-assist": "^0.4.0",
