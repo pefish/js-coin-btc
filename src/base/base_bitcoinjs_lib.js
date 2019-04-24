@@ -620,7 +620,7 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
   /**
    * 签名原生交易
    * @param txHex
-   * @param utxos {array} { wif[, balance][, type][, pubkeys] }
+   * @param utxos {array} { wif[, balance][, type][, pubkeys] } 对多签地址utxo的签名的顺序不影响交易
    * @param network
    * @returns {Promise<void>}
    */

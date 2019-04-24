@@ -67,3 +67,6 @@ const tx1 = walletHelper.signTxHex(
   `mainnet`
 )
 logger.error(JSON.stringify(tx1))
+
+
+logger.error(walletHelper.isAddress(`3AgHM7WNCqxc5AUr1g69uK4ikKCgrqb5cZ`))

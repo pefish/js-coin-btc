@@ -64,6 +64,9 @@ describe('bitcoinWalletHelper', () => {
       const result = walletHelper.isAddress(`36v5uJ54F4VwJU2qzf3t2FQdHgL7d38HUg`, mainnet)
       // logger.error(result)
       assert.strictEqual(result, true)
+      const result1 = walletHelper.isAddress(`3AgHM7WNCqxc5AUr1g69uK4ikKCgrqb5cZ`, mainnet)
+      // logger.error(result1)
+      assert.strictEqual(result1, true)
     } catch (err) {
       logger.error(err)
       assert.throws(() => {}, err)
