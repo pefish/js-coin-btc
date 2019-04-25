@@ -464,8 +464,6 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
 
     for (let utxo of utxos) {
       let {txid, index, balance, sequence} = utxo
-      index = (index === undefined ? utxo['vout'] : index)
-      balance = (balance === undefined ? this.btcToSatoshi(utxo['amount']) : balance)
       if (sequence !== undefined) {
         txBuilder.addInput(txid, index, sequence)
       } else {
