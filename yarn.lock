@@ -1338,19 +1338,10 @@ once@^1.3.0:
   dependencies:
     wrappy "1"
 
-p-js-error@^0.0.3:
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/p-js-error/-/p-js-error-0.0.3.tgz#1c5758ba3a7cd405ce4c4721afcaf41b0ac7e40b"
-  integrity sha512-tPGq0azSO/rQPbYrJIh1jSQF+d4zKu1lyXHMoRKVxjs833aKTdhaC5YUoUiBBW9L1zs6ERXGTARqfawo41wUqw==
-  dependencies:
-    node-assist "^0.4.0"
-
-p-js-utils@^0.0.5:
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/p-js-utils/-/p-js-utils-0.0.5.tgz#69ba16bfaca8ba6216d2febe287c2cd0e85edfd3"
-  integrity sha512-QR7D9sx18kanKHqk2kifBUcgWE/irzm9+Vi1uSHLT1q+Lyy48pHhRtW+DbBXbodLFdG9QszmWzEjpAioA6ei5A==
-  dependencies:
-    p-js-error "^0.0.3"
+p-js-utils@^0.0.8:
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/p-js-utils/-/p-js-utils-0.0.8.tgz#7d19bb906a21b1fe3df5b3a6106266b882fc2130"
+  integrity sha512-mco/9jDrugGISgSWQN8MW2dsb6iQjccPR58c07q8YBgz9MI+YLnre5ayOtKDlzILy20fNNWOb+0L2NtpIktqCw==
 
 path-is-absolute@^1.0.0:
   version "1.0.1"

@@ -34,7 +34,7 @@
     "dashcore-lib": "^8.2.3",
     "ltc-bitcoinjs-lib": "^3.3.10",
     "node-assist": "^0.4.0",
-    "p-js-utils": "^0.0.5",
+    "p-js-utils": "^0.0.8",
     "uload-bitcoinjs-lib": "^3.3.5",
     "ulord-bitcore-lib": "^0.2.1",
     "btc-bitcoinjs-lib": "^5.0.2"
