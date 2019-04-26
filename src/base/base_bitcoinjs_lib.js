@@ -670,8 +670,8 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
   _signUtxos(txBuilder, utxos, network) {
     // logger.error(arguments)
     utxos.map((utxo, index) => {
-      let {wif, type = 'p2pkh', balance, pubkeys, m} = utxo
-      if (type === 'p2pkh') {
+      let {wif, type = 'p2wpkh', balance, pubkeys, m} = utxo
+      if (type === 'p2wpkh') {
         const keyPair = this._bitcoin.ECPair.fromWIF(wif, network)
         txBuilder.sign(index, keyPair)
       } else if (type === 'p2sh(p2wpkh)') {
