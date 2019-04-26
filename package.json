@@ -7,8 +7,8 @@
     "js",
     "tool"
   ],
-  "homepage": "https://gitee.com/pefish/js-btc",
-  "bugs": "https://gitee.com/pefish/js-btc/issues",
+  "homepage": "https://github.com/pefish/js-btc",
+  "bugs": "https://github.com/pefish/js-btc/issues",
   "license": "MIT",
   "author": "pefish",
   "engines": {
@@ -16,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://gitee.com/pefish/js-btc"
+    "url": "https://github.com/pefish/js-btc"
   },
   "scripts": {
     "build": "rm -rf lib && babel src -d lib",
