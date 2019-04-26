@@ -1,8 +1,9 @@
-import BaseBitcoinLike from "./base_bitcoin_like"
+import BaseCoin from './base_coin'
 
-export default class BaseBitcoreLib extends BaseBitcoinLike {
+export default class BaseBitcoreLib extends BaseCoin {
   constructor() {
     super()
+    this.decimals = 8
   }
 
   /**
@@ -78,7 +79,7 @@ export default class BaseBitcoreLib extends BaseBitcoinLike {
       let {txid, index, balance: satoshis, wif} = utxo
       privateKeys.push(this._bitcoin.PrivateKey.fromWIF(wif))
       index = (index === undefined ? utxo['vout'] : index)
-      satoshis = (satoshis === undefined ? this.btcToSatoshi(utxo['amount']) : satoshis)
+      satoshis = (satoshis === undefined ? utxo['amount'].shiftedBy(this.decimals) : satoshis)
       const address = await this.getAddressFromWif(wif, network)
       const script = this._bitcoin.Script.buildPublicKeyHashOut(address).toString()
       totalUtxoBalance = totalUtxoBalance.add(satoshis)

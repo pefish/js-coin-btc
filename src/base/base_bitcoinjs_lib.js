@@ -2,15 +2,15 @@ import BaseCoin from './base_coin'
 import ErrorHelper from 'p-js-error'
 import BigInteger from 'bigi'
 import CryptUtil from 'p-js-utils/lib/crypt'
-import BaseBitcoinLike from "./base_bitcoin_like"
 
 /**
  * 比特币系基类
  * @extends BaseCoin
  */
-export default class BaseBitcoinjsLib extends BaseBitcoinLike {
+export default class BaseBitcoinjsLib extends BaseCoin {
   constructor() {
     super()
+    this.decimals = 8
   }
 
   /**
@@ -403,14 +403,14 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
       for (let i = 0; i < counter; i++) {
         targets.push({
           address: targetAddress,
-          amount: this.satoshiToBtc(outputMinAmount)
+          amount: outputMinAmount.unShiftedBy(this.decimals)
         })
       }
       const tail = totalUtxoNotFee.sub(outputMinAmount.multi(counter.toString()))
       if (tail.gt('0')) {
         targets.push({
           address: targetAddress,
-          amount: this.satoshiToBtc(tail)
+          amount: tail.unShiftedBy(this.decimals)
         })
       }
     } else {
@@ -418,14 +418,14 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
       for (let i = 0; i < outputMaxNum; i++) {
         targets.push({
           address: targetAddress,
-          amount: this.satoshiToBtc(amountPer)
+          amount: amountPer.toString().unShiftedBy(this.decimals)
         })
       }
       const tail = totalUtxoNotFee.minus(amountPer.toString().multi(outputMaxNum))
       if (tail > 0) {
         targets.push({
           address: targetAddress,
-          amount: this.satoshiToBtc(tail)
+          amount: tail.unShiftedBy(this.decimals)
         })
       }
     }
@@ -552,7 +552,7 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
     }
     for (let i = 0; i < tx.outs.length; i++) {
       const output = tx.outs[i]
-      const value = this.satoshiToBtc(output['value'])
+      const value = output['value'].toString().unShiftedBy(this.decimals)
       const tempOutput = {
         value,
         index: i
@@ -636,7 +636,7 @@ export default class BaseBitcoinjsLib extends BaseBitcoinLike {
     }
     for (let i = 0; i < buildedTx.outs.length; i++) {
       const output = buildedTx.outs[i]
-      const value = this.satoshiToBtc(output['value'])
+      const value = output['value'].toString().unShiftedBy(this.decimals)
       const tempOutput = {
         value,
         index: i

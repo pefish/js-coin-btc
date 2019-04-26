@@ -80,7 +80,7 @@ describe('uloadWalletHelper', () => {
         [
           {
             address: 'uMGo8QVMV5nNhZdpmuawoBPuyMEefvbb3Q',
-            amount: walletHelper.btcToSatoshi('10')
+            amount: `1000000000`
           }
         ],
         '10000',
