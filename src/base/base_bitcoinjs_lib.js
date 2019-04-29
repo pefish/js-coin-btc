@@ -62,6 +62,20 @@ export default class BaseBitcoinjsLib extends BaseCoin {
     }
   }
 
+  getMasterPairBySeed (seed, network = 'testnet') {
+    const bip32Lib = require('bip32')
+    const node = bip32Lib.fromSeed(seed.hexToBuffer(), this._bitcoin.networks[network])
+    return {
+      seed: seed.toHexString(false),
+      xpriv: node.toBase58(),  // 主私钥, depth为0(BIP32 Root Key)
+      xpub: node.neutered().toBase58(),  // 主公钥, neutered是去掉私钥价值
+      chainCode: node.chainCode.toHexString(false),
+      privateKey: node.privateKey.toHexString(false),
+      publicKey: node.publicKey.toHexString(false),
+      wif: node.toWIF()
+    }
+  }
+
   /**
    * pub转换
    * @param pubType {string}
