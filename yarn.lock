@@ -742,10 +742,10 @@ bs58check@<3.0.0, bs58check@^2.0.0, bs58check@^2.1.1, bs58check@^2.1.2:
     create-hash "^1.1.0"
     safe-buffer "^5.1.2"
 
-btc-bitcoinjs-lib@^5.0.2:
-  version "5.0.2"
-  resolved "https://registry.yarnpkg.com/btc-bitcoinjs-lib/-/btc-bitcoinjs-lib-5.0.2.tgz#2f61a2387edbd9c41581cd36e52404912ffbcba0"
-  integrity sha512-4u3ByM9WY5VAMrkC/SNhBoF2f1mqbdf3LQCwlNF0kJnT0UhhoghyrWk5N5Rdm13tevA15Qu2s2/K71JaJlgBhw==
+btc-bitcoinjs-lib@^5.0.5:
+  version "5.0.5"
+  resolved "https://registry.yarnpkg.com/btc-bitcoinjs-lib/-/btc-bitcoinjs-lib-5.0.5.tgz#f9a63f483c64bd2c86ac9c034c581cc5dc8d36af"
+  integrity sha512-WRHL9+0lQYqIgQ0DXP4hHVQy4vUAlGIr43fl0RXXF7/D36/DU1YsG2tPgGmnWlF5YNUabpPWe0G8t1T1eTlakw==
   dependencies:
     "@types/node" "10.12.18"
     bech32 "^1.1.2"
