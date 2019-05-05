@@ -1,6 +1,6 @@
 import 'js-node-assist'
 import assert from 'assert'
-import BtcApiHelper from './btc_api'
+import BtcApiHelper from './api'
 
 describe('BtcApiHelper', () => {
 

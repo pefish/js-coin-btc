@@ -1,5 +1,5 @@
 import 'js-node-assist'
-import BitcoinRpcUtil from './bitcoin_rpc'
+import BitcoinRpcUtil from './rpc'
 import assert from 'assert'
 
 declare global {
