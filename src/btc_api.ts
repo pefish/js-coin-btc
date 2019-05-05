@@ -2,6 +2,9 @@ import HttpRequestUtil from 'p-js-utils/lib/http_request'
 import ErrorHelper from 'p-js-error'
 
 export default class BtcApiHelper {
+  _baseUrl: string
+  _token: string
+
   constructor (url, token = '') {
     // this._baseUrl = (network === 'testnet' ? 'https://api.blockcypher.com/v1/btc/test3' : 'https://api.blockcypher.com/v1/btc/main')
     this._baseUrl = url

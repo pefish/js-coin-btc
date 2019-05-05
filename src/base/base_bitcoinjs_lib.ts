@@ -3,14 +3,17 @@ import ErrorHelper from 'p-js-error'
 import BigInteger from 'bigi'
 import CryptUtil from 'p-js-utils/lib/crypt'
 
+
 /**
  * 比特币系基类
  * @extends BaseCoin
  */
 export default class BaseBitcoinjsLib extends BaseCoin {
+  decimals: number = 8
+  _bitcoin: any
+
   constructor() {
     super()
-    this.decimals = 8
   }
 
   /**
@@ -35,7 +38,7 @@ export default class BaseBitcoinjsLib extends BaseCoin {
   getSeedByMnemonic (mnemonic, pass = '') {
     const bip39Lib = require('bip39')
     const seed = bip39Lib.mnemonicToSeedSync(mnemonic, pass)
-    return seed.toHexString(false)
+    return seed.toHexString_(false)
   }
 
   /**
@@ -52,24 +55,25 @@ export default class BaseBitcoinjsLib extends BaseCoin {
     const bip32Lib = require('bip32')
     const node = bip32Lib.fromSeed(seed, this._bitcoin.networks[network])
     return {
+      seed: seed.toHexString_(false),
       xpriv: node.toBase58(),  // 主私钥, depth为0(BIP32 Root Key)
       xpub: node.neutered().toBase58(),  // 主公钥, neutered是去掉私钥价值
-      chainCode: node.chainCode.toHexString(false),
-      privateKey: node.privateKey.toHexString(false),
-      publicKey: node.publicKey.toHexString(false),
+      chainCode: node.chainCode.toHexString_(false),
+      privateKey: node.privateKey.toHexString_(false),
+      publicKey: node.publicKey.toHexString_(false),
       wif: node.toWIF()
     }
   }
 
   getMasterPairBySeed (seed, network = 'testnet') {
     const bip32Lib = require('bip32')
-    const node = bip32Lib.fromSeed(seed.hexToBuffer(), this._bitcoin.networks[network])
+    const node = bip32Lib.fromSeed(seed.hexToBuffer_(), this._bitcoin.networks[network])
     return {
       xpriv: node.toBase58(),  // 主私钥, depth为0(BIP32 Root Key)
       xpub: node.neutered().toBase58(),  // 主公钥, neutered是去掉私钥价值
-      chainCode: node.chainCode.toHexString(false),
-      privateKey: node.privateKey.toHexString(false),
-      publicKey: node.publicKey.toHexString(false),
+      chainCode: node.chainCode.toHexString_(false),
+      privateKey: node.privateKey.toHexString_(false),
+      publicKey: node.publicKey.toHexString_(false),
       wif: node.toWIF()
     }
   }
@@ -96,7 +100,7 @@ export default class BaseBitcoinjsLib extends BaseCoin {
     const b58 = require('bs58check')
     let data = b58.decode(sourcePub)
     data = data.slice(4)
-    data = Buffer.concat([prefix.hexToBuffer(), data])
+    data = Buffer.concat([prefix.hexToBuffer_(), data])
     return b58.encode(data)
   }
 
@@ -120,7 +124,7 @@ export default class BaseBitcoinjsLib extends BaseCoin {
     const b58 = require('bs58check')
     let data = b58.decode(sourcePrv)
     data = data.slice(4)
-    data = Buffer.concat([prefix.hexToBuffer(), data])
+    data = Buffer.concat([prefix.hexToBuffer_(), data])
     return b58.encode(data)
   }
 
@@ -144,7 +148,7 @@ export default class BaseBitcoinjsLib extends BaseCoin {
     return bip32Lib.fromBase58(xpriv, this._bitcoin.networks[network])
   }
 
-  _parseNetwork (network) {
+  _parseNetwork (network): object {
     if (network === `testnet`) {
       return this._bitcoin.networks[`testnet`]
     } else if (network === `mainnet`) {
@@ -159,17 +163,17 @@ export default class BaseBitcoinjsLib extends BaseCoin {
   getAllFromXpub(xpub, network = 'testnet') {
     const node = this.getNodeFromXpub(xpub, network)
     return {
-      chainCode: node.chainCode.toHexString(false),
-      publicKey: node.publicKey.toHexString(false)
+      chainCode: node.chainCode.toHexString_(false),
+      publicKey: node.publicKey.toHexString_(false)
     }
   }
 
   getAllFromWif(wif, network = 'testnet') {
-    network = this._parseNetwork(network)
-    const ecPair = this._bitcoin.ECPair.fromWIF(wif, network)
+    const realNetwork = this._parseNetwork(network)
+    const ecPair = this._bitcoin.ECPair.fromWIF(wif, realNetwork)
     return {
-      privateKey: ecPair.privateKey.toHexString(false),
-      publicKey: ecPair.publicKey.toHexString(false),
+      privateKey: ecPair.privateKey.toHexString_(false),
+      publicKey: ecPair.publicKey.toHexString_(false),
     }
   }
 
@@ -178,9 +182,9 @@ export default class BaseBitcoinjsLib extends BaseCoin {
     return {
       xpub: node.neutered().toBase58(),
       wif: node.toWIF(),
-      privateKey: node.privateKey.toHexString(false),
-      publicKey: node.publicKey.toHexString(false),
-      chainCode: node.chainCode.toHexString(false),
+      privateKey: node.privateKey.toHexString_(false),
+      publicKey: node.publicKey.toHexString_(false),
+      chainCode: node.chainCode.toHexString_(false),
     }
   }
 
@@ -206,15 +210,15 @@ export default class BaseBitcoinjsLib extends BaseCoin {
    * @returns {*|string}
    */
   getAddressType (address, network = 'testnet') {
-    network = this._parseNetwork(network)
+    const realNetwork = this._parseNetwork(network)
     let decode
     try {
       decode = this._bitcoin.address.fromBase58Check(address)
     } catch (e) {}
-    if (decode && decode.version === network.pubKeyHash) {
+    if (decode && decode.version === realNetwork[`pubKeyHash`]) {
       return 'p2pkh'
     }
-    if (decode && decode.version === network.scriptHash) {
+    if (decode && decode.version === realNetwork[`scriptHash`]) {
       return ['p2sh(p2wpkh)', 'p2sh(p2ms)', 'p2sh(p2wsh(p2ms))']
     }
     try {
@@ -237,28 +241,28 @@ export default class BaseBitcoinjsLib extends BaseCoin {
    * @returns {*|boolean}
    */
   verifyAddressType (address, type = 'p2pkh', network = 'testnet') {
-    network = this._parseNetwork(network)
+    const realNetwork = this._parseNetwork(network)
     let decode
     if (type === 'p2pkh') {
       try {
         decode = this._bitcoin.address.fromBase58Check(address)
       } catch (e) {}
       if (decode) {
-        return decode.version === network.pubKeyHash
+        return decode.version === realNetwork[`pubKeyHash`]
       }
     } else if (type === 'p2sh(p2wpkh)' || type === 'p2sh(p2ms)' || type === 'p2sh(p2wsh(p2ms))') {
       try {
         decode = this._bitcoin.address.fromBase58Check(address)
       } catch (e) {}
       if (decode) {
-        return decode.version === network.scriptHash
+        return decode.version === realNetwork[`scriptHash`]
       }
     } else if (type === 'p2wpkh') {
       try {
         decode = this._bitcoin.address.fromBech32(address)
       } catch (e) {}
       if (decode) {
-        if (decode.prefix !== network.bech32) throw new ErrorHelper(address + ' has an invalid prefix')
+        if (decode.prefix !== realNetwork[`bech32`]) throw new ErrorHelper(address + ' has an invalid prefix')
         if (decode.version === 0) {
           return decode.data.length === 20
         }
@@ -268,7 +272,7 @@ export default class BaseBitcoinjsLib extends BaseCoin {
         decode = this._bitcoin.address.fromBech32(address)
       } catch (e) {}
       if (decode) {
-        if (decode.prefix !== network.bech32) throw new ErrorHelper(address + ' has an invalid prefix')
+        if (decode.prefix !== realNetwork[`bech32`]) throw new ErrorHelper(address + ' has an invalid prefix')
         if (decode.version === 0) {
           return decode.data.length === 32
         }
@@ -280,23 +284,23 @@ export default class BaseBitcoinjsLib extends BaseCoin {
   }
 
   getAddressFromPublicKey(publicKey, type = 'p2pkh', network = 'testnet') {
-    network = this._parseNetwork(network)
+    const realNetwork = this._parseNetwork(network)
     if (type === 'p2pkh') {
       // 常规地址
       return this._bitcoin.payments.p2pkh({
-        pubkey: publicKey.hexToBuffer(),
-        network
+        pubkey: publicKey.hexToBuffer_(),
+        realNetwork
       })[`address`]
     } else if (type === 'p2wpkh') {
       return this._bitcoin.payments.p2wpkh({
-        pubkey: publicKey.hexToBuffer(),
-        network
+        pubkey: publicKey.hexToBuffer_(),
+        realNetwork
       })[`address`]
     } else if (type === 'p2sh(p2wpkh)') {
       // 这就是segwit地址，bitcoind的p2sh-segwit参数(p2sh-segwit)
       return this._bitcoin.payments.p2sh({
-        redeem: this._bitcoin.payments.p2wpkh({ pubkey: publicKey.hexToBuffer(), network }),
-        network
+        redeem: this._bitcoin.payments.p2wpkh({ pubkey: publicKey.hexToBuffer_(), realNetwork }),
+        realNetwork
       })[`address`]
     } else if (type === 'p2wsh(p2ms)') {
       const {pubkeys, m} = publicKey
@@ -304,8 +308,8 @@ export default class BaseBitcoinjsLib extends BaseCoin {
         return Buffer.from(hex, 'hex')
       })
       return this._bitcoin.payments.p2wsh({
-        redeem: this._bitcoin.payments.p2ms({ m, pubkeys: pubKeysBuffer, network }),
-        network
+        redeem: this._bitcoin.payments.p2ms({ m, pubkeys: pubKeysBuffer, realNetwork }),
+        realNetwork
       })[`address`]
     } else if (type === 'p2sh(p2wsh(p2ms))') {
       const {pubkeys, m} = publicKey
@@ -314,10 +318,10 @@ export default class BaseBitcoinjsLib extends BaseCoin {
       })
       return this._bitcoin.payments.p2sh({
         redeem: this._bitcoin.payments.p2wsh({
-          redeem: this._bitcoin.payments.p2ms({ m, pubkeys: pubKeysBuffer, network }),
-          network
+          redeem: this._bitcoin.payments.p2ms({ m, pubkeys: pubKeysBuffer, realNetwork }),
+          realNetwork
         }),
-        network
+        realNetwork
       })[`address`]
     } else if (type === 'p2sh(p2ms)') {
       // 网上一般用这个
@@ -326,8 +330,8 @@ export default class BaseBitcoinjsLib extends BaseCoin {
         return Buffer.from(hex, 'hex')
       })
       return this._bitcoin.payments.p2sh({
-        redeem: this._bitcoin.payments.p2ms({ m, pubkeys: pubKeysBuffer, network }),
-        network
+        redeem: this._bitcoin.payments.p2ms({ m, pubkeys: pubKeysBuffer, realNetwork }),
+        realNetwork
       })[`address`]
     } else {
       throw new ErrorHelper('type指定错误')
@@ -342,7 +346,7 @@ export default class BaseBitcoinjsLib extends BaseCoin {
    */
   getKeyPairFromMint(mintStr, compress = true, network = 'testnet') {
     const afterSha256 = CryptUtil.sha256(mintStr)
-    return new this._bitcoin.ECPair(BigInteger.fromBuffer(afterSha256.hexToBuffer()), null, {
+    return new this._bitcoin.ECPair(BigInteger.fromBuffer(afterSha256.hexToBuffer_()), null, {
       compressed: compress,
       network: this._bitcoin.networks[network]
     })
@@ -367,9 +371,9 @@ export default class BaseBitcoinjsLib extends BaseCoin {
       xpriv: currentNode.toBase58(), // BIP32 Extended Private Key
       xpub: currentNode.neutered().toBase58(), // BIP32 Extended Public Key
       wif: currentNode.toWIF(),
-      chainCode: currentNode.chainCode.toHexString(false),
-      privateKey: currentNode.privateKey.toHexString(false),
-      publicKey: currentNode.publicKey.toHexString(false)
+      chainCode: currentNode.chainCode.toHexString_(false),
+      privateKey: currentNode.privateKey.toHexString_(false),
+      publicKey: currentNode.publicKey.toHexString_(false)
     }
   }
 
@@ -385,8 +389,8 @@ export default class BaseBitcoinjsLib extends BaseCoin {
     const currentNode = node.derivePath(path).neutered()
     return {
       path,
-      chainCode: currentNode.chainCode.toHexString(false),
-      publicKey: currentNode.publicKey.toHexString(false)
+      chainCode: currentNode.chainCode.toHexString_(false),
+      publicKey: currentNode.publicKey.toHexString_(false)
     }
   }
 
@@ -405,39 +409,39 @@ export default class BaseBitcoinjsLib extends BaseCoin {
     outputMinAmount = outputMinAmount.toString()
     outputMaxNum = outputMaxNum.toString()
     let totalUtxoBalance = '0'
-    for (let utxo of utxos) {
+    for (const utxo of utxos) {
       const {balance} = utxo
-      totalUtxoBalance = totalUtxoBalance.add(balance.toString())
+      totalUtxoBalance = totalUtxoBalance.add_(balance.toString())
     }
-    const totalUtxoNotFee = totalUtxoBalance.sub(fee)
-    if (totalUtxoNotFee.div(outputMinAmount).lt(outputMaxNum)) {
-      const counter = parseInt(totalUtxoNotFee.div(outputMinAmount).toNumber())
+    const totalUtxoNotFee = totalUtxoBalance.sub_(fee)
+    if (totalUtxoNotFee.div_(outputMinAmount).lt_(outputMaxNum)) {
+      const counter = parseInt(totalUtxoNotFee.div_(outputMinAmount))
       for (let i = 0; i < counter; i++) {
         targets.push({
           address: targetAddress,
-          amount: outputMinAmount.unShiftedBy(this.decimals)
+          amount: outputMinAmount.unShiftedBy_(this.decimals)
         })
       }
-      const tail = totalUtxoNotFee.sub(outputMinAmount.multi(counter.toString()))
-      if (tail.gt('0')) {
+      const tail = totalUtxoNotFee.sub_(outputMinAmount.multi_(counter.toString()))
+      if (tail.gt_('0')) {
         targets.push({
           address: targetAddress,
-          amount: tail.unShiftedBy(this.decimals)
+          amount: tail.unShiftedBy_(this.decimals)
         })
       }
     } else {
-      const amountPer = parseInt(totalUtxoNotFee.div(outputMaxNum).toNumber())
+      const amountPer = parseInt(totalUtxoNotFee.div_(outputMaxNum))
       for (let i = 0; i < outputMaxNum; i++) {
         targets.push({
           address: targetAddress,
-          amount: amountPer.toString().unShiftedBy(this.decimals)
+          amount: amountPer.toString().unShiftedBy_(this.decimals)
         })
       }
-      const tail = totalUtxoNotFee.minus(amountPer.toString().multi(outputMaxNum))
-      if (tail > 0) {
+      const tail = totalUtxoNotFee.sub_(amountPer.toString().multi_(outputMaxNum))
+      if (tail.gt_(0)) {
         targets.push({
           address: targetAddress,
-          amount: tail.unShiftedBy(this.decimals)
+          amount: tail.unShiftedBy_(this.decimals)
         })
       }
     }
@@ -461,8 +465,8 @@ export default class BaseBitcoinjsLib extends BaseCoin {
    * @returns {Promise.<*>}
    */
   buildTransaction(utxos, targets, fee, changeAddress, network = 'testnet', sign = true, version = 2) {
-    network = this._parseNetwork(network)
-    const txBuilder = new this._bitcoin.TransactionBuilder(network, 3000)
+    const realNetwork = this._parseNetwork(network)
+    const txBuilder = new this._bitcoin.TransactionBuilder(realNetwork, 3000)
     txBuilder.setVersion(version)
     let totalUtxoBalance = '0'
 
@@ -470,31 +474,31 @@ export default class BaseBitcoinjsLib extends BaseCoin {
       throw new ErrorHelper(`没有输入`)
     }
 
-    if (fee.gt(`10000000`)) {
+    if (fee.gt_(`10000000`)) {
       throw new ErrorHelper(`手续费过高，请检查`)
     }
 
-    for (let utxo of utxos) {
-      let {txid, index, balance, sequence} = utxo
+    for (const utxo of utxos) {
+      const {txid, index, balance, sequence} = utxo
       if (sequence !== undefined) {
         txBuilder.addInput(txid, index, sequence)
       } else {
         txBuilder.addInput(txid, index)
       }
-      totalUtxoBalance = totalUtxoBalance.add(balance)
+      totalUtxoBalance = totalUtxoBalance.add_(balance)
     }
 
     let targetTotalAmount = '0'
     // 计算要发送出去的总额
     targets.forEach((target) => {
       const {amount} = target
-      targetTotalAmount = targetTotalAmount.add(amount.toString())
+      targetTotalAmount = targetTotalAmount.add_(amount.toString())
     })
 
     const outputWithIndex = []
 
     // 添加其他输出
-    for (let target of targets) {
+    for (const target of targets) {
       const {address, amount, msg} = target
       let outputScript = address
       if (address === null && msg) {
@@ -503,7 +507,7 @@ export default class BaseBitcoinjsLib extends BaseCoin {
       }
       let index = null
       try {
-        index = txBuilder.addOutput(outputScript, amount.toNumber())
+        index = txBuilder.addOutput(outputScript, amount.toNumber_())
         outputWithIndex.push(Object.assign(target, {
           index
         }))
@@ -511,17 +515,17 @@ export default class BaseBitcoinjsLib extends BaseCoin {
         throw new ErrorHelper('构造output出错' + err['message'], 0, JSON.stringify(target), err)
       }
     }
-    if (fee.lt(1000)) {
+    if (fee.lt_(1000)) {
       fee = '1000'
     }
     // 添加找零的输出
-    const changeAmount = totalUtxoBalance.sub(targetTotalAmount).sub(fee.toString())
-    if (changeAmount.lt(0)) {
+    const changeAmount = totalUtxoBalance.sub_(targetTotalAmount).sub_(fee.toString())
+    if (changeAmount.lt_(0)) {
       throw new ErrorHelper(`balance not enough`)
     }
     if (changeAmount !== '0') {
-      const amount = totalUtxoBalance.sub(targetTotalAmount).sub(fee.toString())
-      const index = txBuilder.addOutput(changeAddress, amount.toNumber())
+      const amount = totalUtxoBalance.sub_(targetTotalAmount).sub_(fee.toString())
+      const index = txBuilder.addOutput(changeAddress, amount.toNumber_())
       outputWithIndex.push({
         address: changeAddress,
         amount,
@@ -531,7 +535,7 @@ export default class BaseBitcoinjsLib extends BaseCoin {
     let buildedTx = null
     if (sign) {
       // 签名
-      buildedTx = this._signUtxos(txBuilder, utxos, network)
+      buildedTx = this._signUtxos(txBuilder, utxos, realNetwork)
     } else {
       buildedTx = txBuilder.buildIncomplete()
     }
@@ -554,17 +558,18 @@ export default class BaseBitcoinjsLib extends BaseCoin {
    */
   decodeTxHex(txHex, network = 'testnet') {
     const tx = this._bitcoin.Transaction.fromHex(txHex)
-    let inputs = [], outputs = [], outputAmount = '0'
-    for (let input of tx.ins) {
+    const inputs = [], outputs = []
+    let outputAmount = '0'
+    for (const input of tx.ins) {
       inputs.push({
-        hash: input['hash'].reverse().toHexString(false),
+        hash: input['hash'].reverse().toHexString_(false),
         index: input['index'],
         sequence: input['sequence']
       })
     }
     for (let i = 0; i < tx.outs.length; i++) {
       const output = tx.outs[i]
-      const value = output['value'].toString().unShiftedBy(this.decimals)
+      const value = output['value'].toString().unShiftedBy_(this.decimals)
       const tempOutput = {
         value,
         index: i
@@ -572,11 +577,11 @@ export default class BaseBitcoinjsLib extends BaseCoin {
       try {
         tempOutput['address'] = this.outputScriptToAddress(output['script'], network)
       } catch (err) {
-        tempOutput['script'] = output['script'].toHexString(false)
+        tempOutput['script'] = output['script'].toHexString_(false)
       }
 
       outputs.push(tempOutput)
-      outputAmount = outputAmount.add(value)
+      outputAmount = outputAmount.add_(value)
     }
     return {
       txHex: tx.toHex(),
@@ -638,17 +643,18 @@ export default class BaseBitcoinjsLib extends BaseCoin {
     const realNetwork = this._parseNetwork(network)
     const txBuilder = this._bitcoin.TransactionBuilder.fromTransaction(this._bitcoin.Transaction.fromHex(txHex), realNetwork)
     const buildedTx = this._signUtxos(txBuilder, utxos, realNetwork)
-    let inputs = [], outputs = [], outputAmount = '0'
-    for (let input of buildedTx.ins) {
+    const inputs = [], outputs = []
+    let outputAmount = '0'
+    for (const input of buildedTx.ins) {
       inputs.push({
-        hash: input['hash'].reverseBuffer().toHexString(false),
+        hash: input['hash'].reverseBuffer_().toHexString_(false),
         index: input['index'],
         sequence: input['sequence']
       })
     }
     for (let i = 0; i < buildedTx.outs.length; i++) {
       const output = buildedTx.outs[i]
-      const value = output['value'].toString().unShiftedBy(this.decimals)
+      const value = output['value'].toString().unShiftedBy_(this.decimals)
       const tempOutput = {
         value,
         index: i
@@ -656,11 +662,11 @@ export default class BaseBitcoinjsLib extends BaseCoin {
       try {
         tempOutput['address'] = this.outputScriptToAddress(output['script'], network)
       } catch (err) {
-        tempOutput['script'] = output['script'].toHexString(false)
+        tempOutput['script'] = output['script'].toHexString_(false)
       }
 
       outputs.push(tempOutput)
-      outputAmount = outputAmount.add(value)
+      outputAmount = outputAmount.add_(value)
     }
     return {
       txHex: buildedTx.toHex(),
@@ -682,7 +688,7 @@ export default class BaseBitcoinjsLib extends BaseCoin {
   _signUtxos(txBuilder, utxos, network) {
     // logger.error(arguments)
     utxos.map((utxo, index) => {
-      let {wif, type = 'p2wpkh', balance, pubkeys, m} = utxo
+      const {wif, type = 'p2wpkh', balance, pubkeys, m} = utxo
       if (type === 'p2wpkh') {
         const keyPair = this._bitcoin.ECPair.fromWIF(wif, network)
         txBuilder.sign(index, keyPair)
@@ -692,7 +698,7 @@ export default class BaseBitcoinjsLib extends BaseCoin {
           redeem: this._bitcoin.payments.p2wpkh({ pubkey: keyPair.publicKey, network }),
           network
         })[`redeem`][`output`]
-        txBuilder.sign(index, keyPair, redeemScriptBuffer, null, balance.toNumber())
+        txBuilder.sign(index, keyPair, redeemScriptBuffer, null, balance.toNumber_())
       } else if (type === 'p2wsh(p2ms)') {
         const keyPairs = wif.map((wif_) => {
           return this._bitcoin.ECPair.fromWIF(wif_, network)
@@ -704,7 +710,7 @@ export default class BaseBitcoinjsLib extends BaseCoin {
           redeem: this._bitcoin.payments.p2ms({ m: m || keyPairs.length, pubkeys: pubKeysBuffer, network }),
           network
         })
-        for (let keyPair of keyPairs) {
+        for (const keyPair of keyPairs) {
           txBuilder.sign(index, keyPair, p2sh.redeem.output)
         }
       } else if (type === 'p2sh(p2ms)') {
@@ -718,7 +724,7 @@ export default class BaseBitcoinjsLib extends BaseCoin {
           redeem: this._bitcoin.payments.p2ms({ m: m || keyPairs.length, pubkeys: pubKeysBuffer, network }),
           network
         })
-        for (let keyPair of keyPairs) {
+        for (const keyPair of keyPairs) {
           txBuilder.sign(index, keyPair, p2sh.redeem.output)
         }
       } else if (type === 'p2sh(p2wsh(p2ms))') {
@@ -733,8 +739,8 @@ export default class BaseBitcoinjsLib extends BaseCoin {
           network
         })
         const p2sh = this._bitcoin.payments.p2sh({ redeem: p2wsh, network })
-        for (let keyPair of keyPairs) {
-          txBuilder.sign(index, keyPair, p2sh.redeem.output, null, balance.toNumber(), p2wsh.redeem.output)
+        for (const keyPair of keyPairs) {
+          txBuilder.sign(index, keyPair, p2sh.redeem.output, null, balance.toNumber_(), p2wsh.redeem.output)
         }
       } else {
         throw new ErrorHelper('utxo中type指定错误')

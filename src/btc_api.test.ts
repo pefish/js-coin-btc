@@ -1,5 +1,5 @@
-import 'node-assist'
-import assert from "assert"
+import 'js-node-assist'
+import assert from 'assert'
 import BtcApiHelper from './btc_api'
 
 describe('BtcApiHelper', () => {
@@ -25,10 +25,10 @@ describe('BtcApiHelper', () => {
   it('getAddressInfo', async () => {
     try {
       const result = await helper.getAddressInfo('2NBV483qX29Zd7yCPUUmUCCXpLnu51EExwP')
-      logger.error('1', result)
+      global.logger.error('1', result)
       // assert.notStrictEqual(result, undefined)
     } catch (err) {
-      logger.error(err)
+      global.logger.error(err)
       assert.throws(() => {}, err)
     }
   })
@@ -36,10 +36,10 @@ describe('BtcApiHelper', () => {
   it('getBalance', async () => {
     try {
       const result = await helper.getBalance('2NBV483qX29Zd7yCPUUmUCCXpLnu51EExwP')
-      logger.error('2', result)
+      global.logger.error('2', result)
       // assert.notStrictEqual(result, undefined)
     } catch (err) {
-      logger.error(err)
+      global.logger.error(err)
       assert.throws(() => {}, err)
     }
   })
@@ -47,10 +47,10 @@ describe('BtcApiHelper', () => {
   it('getChainInfo', async () => {
     try {
       const result = await helper.getChainInfo()
-      logger.error('3', result)
+      global.logger.error('3', result)
       // assert.notStrictEqual(result, undefined)
     } catch (err) {
-      logger.error(err)
+      global.logger.error(err)
       assert.throws(() => {}, err)
     }
   })

@@ -1,6 +1,6 @@
 {
   "name": "js-btc",
-  "version": "0.1.7",
+  "version": "0.2.0",
   "description": "btc tool of js",
   "keywords": [
     "common",
@@ -19,11 +19,17 @@
     "url": "https://github.com/pefish/js-btc"
   },
   "scripts": {
-    "build": "rm -rf lib && babel src -d lib",
-    "test": "mocha -t 20000 -R spec --compilers js:babel-core/register --require babel-polyfill tests/*.test.js"
+    "build": "tsc && yarn tslint",
+    "test": "mocha --timeout 6000 --require ts-node/register tests/*.test.js",
+    "tslint": "tslint -c tslint.json -p tsconfig.json"
   },
   "devDependencies": {
-    "babel-preset-env": "^1.7.0",
+    "@types/chai": "^4.1.7",
+    "@types/mocha": "^5.2.6",
+    "@types/node": "^11.13.7",
+    "ts-node": "^8.1.0",
+    "tslint": "^5.16.0",
+    "typescript": "^3.4.5",
     "bcc-bitcoinjs-lib": "^3.1.8",
     "bchaddrjs": "^0.2.1",
     "dashcore-lib": "^8.2.3",
@@ -48,12 +54,13 @@
     }
   },
   "dependencies": {
-    "p-js-error": "^0.0.4",
     "bip32": "^1.0.4",
     "bip39": "^3.0.1",
     "bitcoin-core": "^2.0.0",
     "btc-bitcoinjs-lib": "^5.0.5",
+    "js-node-assist": "^0.5.6",
     "node-assist": "^0.4.0",
+    "p-js-error": "^0.0.4",
     "p-js-utils": "^0.0.8"
   }
 }

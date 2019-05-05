@@ -1,6 +1,14 @@
-import 'node-assist'
-import BitcoinRpcUtil from './BitcoinRpcUtil'
-import assert from "assert"
+import 'js-node-assist'
+import BitcoinRpcUtil from './bitcoin_rpc'
+import assert from 'assert'
+
+declare global {
+  namespace NodeJS {
+    interface Global {
+      logger: any;
+    }
+  }
+}
 
 describe('bitcoinRpcUtil', () => {
 
@@ -9,11 +17,11 @@ describe('bitcoinRpcUtil', () => {
 
   before(async () => {
     rpcClient = BitcoinRpcUtil.getRpcHelper({
-      "host": "47.52.247.51/btc",
-      "port": 80,
-      "username": "test",
-      "password": "123456789",
-      "ssl": false
+      'host': '47.52.247.51/btc',
+      'port': 80,
+      'username': 'test',
+      'password': '123456789',
+      'ssl': false
     })
   })
 
@@ -28,7 +36,7 @@ describe('bitcoinRpcUtil', () => {
       ])
       assert.notStrictEqual(result, undefined)
     } catch (err) {
-      logger.error(err)
+      global.logger.error(err)
       assert.throws(() => {}, err)
     }
   })
