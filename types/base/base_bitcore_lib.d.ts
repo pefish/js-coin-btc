@@ -1,7 +1,7 @@
 import BaseCoin from './base_coin';
-export default class BaseBitcoreLib extends BaseCoin {
-    decimals: number;
-    _bitcoin: any;
+export default abstract class BaseBitcoreLib extends BaseCoin {
+    abstract decimals: number;
+    abstract bitcoinLib: any;
     constructor();
     /**
      * 得到HDPrivateKey实例

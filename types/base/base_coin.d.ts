@@ -4,7 +4,7 @@
 /**
  * 虚拟货币基类
  */
-declare class BaseCoin {
+declare abstract class BaseCoin {
     /**
      * 使用伪随机函数PBKDF2(将salted hash进行多次重复计算)生成随机数
      * @param mnemonic

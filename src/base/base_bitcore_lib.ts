@@ -1,8 +1,8 @@
 import BaseCoin from './base_coin'
 
-export default class BaseBitcoreLib extends BaseCoin {
-  decimals: number = 8
-  _bitcoin: any
+export default abstract class BaseBitcoreLib extends BaseCoin {
+  public abstract decimals: number
+  public abstract bitcoinLib: any
 
   constructor() {
     super()
@@ -15,7 +15,7 @@ export default class BaseBitcoreLib extends BaseCoin {
    * @returns {*}
    */
   getHdPrivateKeyBySeed(seed, network = 'testnet') {
-    return this._bitcoin.HDPrivateKey.fromSeed(seed, network)
+    return this.bitcoinLib.HDPrivateKey.fromSeed(seed, network)
   }
 
   /**
@@ -49,15 +49,15 @@ export default class BaseBitcoreLib extends BaseCoin {
    * @param network
    */
   getAddressFromWif(wif, network = 'testnet') {
-    const privateKeyObj = this._bitcoin.PrivateKey.fromWIF(wif)
+    const privateKeyObj = this.bitcoinLib.PrivateKey.fromWIF(wif)
     const publicKeyObj = privateKeyObj.toPublicKey()
     return publicKeyObj.toAddress(network).toString()
   }
 
   // getAddressfromScriptHash(wif, network = 'testnet') {
-  //   const privateKeyObj = this._bitcoin.PrivateKey.fromWIF(wif)
+  //   const privateKeyObj = this.bitcoinLib.PrivateKey.fromWIF(wif)
   //   const publicKeyObj = privateKeyObj.toPublicKey()
-  //   const scriptHash = this._bitcoin.Address.fromScriptHash(new Buffer(publicKeyObj.toString(), 'hex'), network)
+  //   const scriptHash = this.bitcoinLib.Address.fromScriptHash(new Buffer(publicKeyObj.toString(), 'hex'), network)
   // }
 
   /**
@@ -77,11 +77,11 @@ export default class BaseBitcoreLib extends BaseCoin {
     for (const utxo of utxos) {
       let { index, balance: satoshis} = utxo
       const { txid, wif } = utxo
-      privateKeys.push(this._bitcoin.PrivateKey.fromWIF(wif))
+      privateKeys.push(this.bitcoinLib.PrivateKey.fromWIF(wif))
       index = (index === undefined ? utxo['vout'] : index)
       satoshis = (satoshis === undefined ? utxo['amount'].shiftedBy(this.decimals) : satoshis)
       const address = this.getAddressFromWif(wif, network)
-      const script = this._bitcoin.Script.buildPublicKeyHashOut(address).toString()
+      const script = this.bitcoinLib.Script.buildPublicKeyHashOut(address).toString()
       totalUtxoBalance = totalUtxoBalance.add_(satoshis)
       newUtxos.push({
         txid: txid,
@@ -108,7 +108,7 @@ export default class BaseBitcoreLib extends BaseCoin {
     if (fee.lt(1000)) {
       fee = '1000'
     }
-    const transaction = this._bitcoin.Transaction().from(newUtxos).to(targetData).fee(fee.toNumber()).change(changeAddress).sign(privateKeys)
+    const transaction = this.bitcoinLib.Transaction().from(newUtxos).to(targetData).fee(fee.toNumber()).change(changeAddress).sign(privateKeys)
     // 添加找零的输出
     changeAmount = totalUtxoBalance.sub_(targetTotalAmount).sub_(fee.toString())
     if (changeAmount !== '0') {
@@ -140,6 +140,6 @@ export default class BaseBitcoreLib extends BaseCoin {
    * @returns {*}
    */
   isAddress(address, network = 'testnet', type = 'pubkeyhash') {
-    return this._bitcoin.Address.isValid(address, network, type)
+    return this.bitcoinLib.Address.isValid(address, network, type)
   }
 }

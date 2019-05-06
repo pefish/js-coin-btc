@@ -3,9 +3,9 @@ import BaseCoin from './base_coin';
  * 比特币系基类
  * @extends BaseCoin
  */
-export default class BaseBitcoinjsLib extends BaseCoin {
-    decimals: number;
-    _bitcoin: any;
+export default abstract class BaseBitcoinjsLib extends BaseCoin {
+    abstract decimals: number;
+    abstract bitcoinLib: any;
     constructor();
     /**
      * 随机生成由12个单词组成的bit39标准助记码

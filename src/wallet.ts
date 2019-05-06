@@ -7,10 +7,12 @@ import BaseBitcoinjsLib from './base/base_bitcoinjs_lib'
  * @extends BaseBitcoinjsLib
  */
 class BitcoinWalletHelper extends BaseBitcoinjsLib {
+  decimals: number = 8
+  bitcoinLib: any
 
   constructor () {
     super()
-    this._bitcoin = require('btc-bitcoinjs-lib')
+    this.bitcoinLib = require('btc-bitcoinjs-lib')
   }
 }
 

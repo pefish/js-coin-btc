@@ -6,6 +6,8 @@ import BaseBitcoinjsLib from './base/base_bitcoinjs_lib';
  * @extends BaseBitcoinjsLib
  */
 declare class BitcoinWalletHelper extends BaseBitcoinjsLib {
+    decimals: number;
+    bitcoinLib: any;
     constructor();
 }
 export default BitcoinWalletHelper;
