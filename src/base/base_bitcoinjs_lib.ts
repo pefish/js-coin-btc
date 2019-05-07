@@ -176,7 +176,7 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
     }
   }
 
-  getAllFromPrivateKey(privateKey, network, compressed = true) {
+  getAllFromPrivateKey(privateKey: string, network: string, compressed = true) {
     const realNetwork = this._parseNetwork(network)
     if (privateKey.startsWith(`0x`)) {
       privateKey = privateKey.substring(2, privateKey.length)
