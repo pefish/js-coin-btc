@@ -151,6 +151,17 @@ describe('bitcoinWalletHelper', () => {
     }
   })
 
+  it('getAllFromPrivateKey', async () => {
+    try {
+      const result = walletHelper.getAllFromPrivateKey('0xff80e6800f8e0b9c27431f3cf6c4346175eaad12745a91bd41c7141e70c58378', mainnet)
+      // logger.error(result)
+      assert.strictEqual(result['publicKey'], '02f7166a1fd8dd1b253667c63af6e580d9867abe79e48d4df655c98b71fd81a8e8')
+    } catch (err) {
+      global.logger.error(err)
+      assert.throws(() => {}, err)
+    }
+  })
+
   it('getAllFromXpub', async () => {
     try {
       const result = walletHelper.getAllFromXpub(`xpub6G7UGdTHmM3aX7BQGfX23YMvFXx9sMMTC2xYFDW5JkHC3aLsBCTaeoRevrz315PZRFeBaRdjEQo3kPqHDytwmGaUV9ZjSxqukscuaG5CqVb`, mainnet)

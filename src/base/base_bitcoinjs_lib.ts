@@ -176,6 +176,22 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
     }
   }
 
+  getAllFromPrivateKey(privateKey, network, compressed = true) {
+    const realNetwork = this._parseNetwork(network)
+    if (privateKey.startsWith(`0x`)) {
+      privateKey = privateKey.substring(2, privateKey.length)
+    }
+
+    const ecPair = this.bitcoinLib.ECPair.fromPrivateKey(privateKey.hexToBuffer_(), {
+      network: realNetwork,
+      compressed,
+    })
+    return {
+      privateKey: ecPair.privateKey.toHexString_(false),
+      publicKey: ecPair.publicKey.toHexString_(false),
+    }
+  }
+
   getAllFromXpriv(xpriv, network = 'testnet') {
     const node = this.getNodeFromXpriv(xpriv, network)
     return {

@@ -78,6 +78,10 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
         privateKey: any;
         publicKey: any;
     };
+    getAllFromPrivateKey(privateKey: any, network: any, compressed?: boolean): {
+        privateKey: any;
+        publicKey: any;
+    };
     getAllFromXpriv(xpriv: any, network?: string): {
         xpub: any;
         wif: any;
