@@ -577,7 +577,7 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
     let outputAmount = '0'
     for (const input of tx.ins) {
       inputs.push({
-        hash: input['hash'].reverse().toHexString_(false),
+        hash: input['hash'].reverseBuffer_().toHexString_(false),
         index: input['index'],
         sequence: input['sequence']
       })
