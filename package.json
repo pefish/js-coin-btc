@@ -1,6 +1,6 @@
 {
   "name": "js-btc",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "btc tool of js",
   "keywords": [
     "common",
@@ -39,6 +39,7 @@
     "ulord-bitcore-lib": "^0.2.1"
   },
   "dependencies": {
+    "bigi": "^1.4.2",
     "bip32": "^1.0.4",
     "bip39": "^3.0.1",
     "bitcoin-core": "^2.0.0",
