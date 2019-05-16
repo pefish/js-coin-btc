@@ -1,6 +1,7 @@
 /** @module */
 import 'js-node-assist'
 import BaseBitcoinjsLib from './base/base_bitcoinjs_lib'
+import ErrorHelper from 'p-js-error'
 
 /**
  * 比特币钱包帮助类
@@ -13,6 +14,20 @@ class BitcoinWalletHelper extends BaseBitcoinjsLib {
   constructor () {
     super()
     this.bitcoinLib = require('btc-bitcoinjs-lib')
+  }
+
+  parseNetwork (network): object {
+    if (network === `testnet`) {
+      return this.bitcoinLib.networks[`testnet`]
+    } else if (network === `mainnet`) {
+      return this.bitcoinLib.networks[`bitcoin`]
+    } else if (network === `regtest`) {
+      return this.bitcoinLib.networks[`regtest`]
+    } else if (network === `test`) {
+      return this.bitcoinLib.networks[`vds`]
+    } else {
+      throw new ErrorHelper(`network error`)
+    }
   }
 }
 

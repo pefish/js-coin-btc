@@ -69,7 +69,7 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
      * @param network
      */
     getNodeFromXpriv(xpriv: any, network?: string): any;
-    _parseNetwork(network: any): object;
+    parseNetwork(network: any): object;
     getAllFromXpub(xpub: any, network?: string): {
         chainCode: any;
         publicKey: any;

@@ -48,11 +48,12 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
    * @returns {{seed: string, xpriv, xpub}}
    */
   getMasterPairByMnemonic (mnemonic, pass = '', network = 'testnet') {
+    const realNetwork = this.parseNetwork(network)
     const bip39Lib = require('bip39')
     const seed = bip39Lib.mnemonicToSeedSync(mnemonic, pass) // 种子buffer
 
     const bip32Lib = require('bip32')
-    const node = bip32Lib.fromSeed(seed, this.bitcoinLib.networks[network])
+    const node = bip32Lib.fromSeed(seed, realNetwork)
     return {
       seed: seed.toHexString_(false),
       xpriv: node.toBase58(),  // 主私钥, depth为0(BIP32 Root Key)
@@ -65,8 +66,9 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
   }
 
   getMasterPairBySeed (seed, network = 'testnet') {
+    const realNetwork = this.parseNetwork(network)
     const bip32Lib = require('bip32')
-    const node = bip32Lib.fromSeed(seed.hexToBuffer_(), this.bitcoinLib.networks[network])
+    const node = bip32Lib.fromSeed(seed.hexToBuffer_(), realNetwork)
     return {
       xpriv: node.toBase58(),  // 主私钥, depth为0(BIP32 Root Key)
       xpub: node.neutered().toBase58(),  // 主公钥, neutered是去掉私钥价值
@@ -133,8 +135,9 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
    * @param network
    */
   getNodeFromXpub (xpub, network = 'testnet') {
+    const realNetwork = this.parseNetwork(network)
     const bip32Lib = require('bip32')
-    return bip32Lib.fromBase58(xpub, this.bitcoinLib.networks[network]).neutered()
+    return bip32Lib.fromBase58(xpub, realNetwork).neutered()
   }
 
   /**
@@ -143,11 +146,12 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
    * @param network
    */
   getNodeFromXpriv (xpriv, network = 'testnet') {
+    const realNetwork = this.parseNetwork(network)
     const bip32Lib = require('bip32')
-    return bip32Lib.fromBase58(xpriv, this.bitcoinLib.networks[network])
+    return bip32Lib.fromBase58(xpriv, realNetwork)
   }
 
-  _parseNetwork (network): object {
+  parseNetwork (network): object {
     if (network === `testnet`) {
       return this.bitcoinLib.networks[`testnet`]
     } else if (network === `mainnet`) {
@@ -168,7 +172,7 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
   }
 
   getAllFromWif(wif, network = 'testnet') {
-    const realNetwork = this._parseNetwork(network)
+    const realNetwork = this.parseNetwork(network)
     const ecPair = this.bitcoinLib.ECPair.fromWIF(wif, realNetwork)
     return {
       privateKey: ecPair.privateKey.toHexString_(false),
@@ -177,7 +181,7 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
   }
 
   getAllFromPrivateKey(privateKey: string, network: string, compressed = true) {
-    const realNetwork = this._parseNetwork(network)
+    const realNetwork = this.parseNetwork(network)
     if (privateKey.startsWith(`0x`)) {
       privateKey = privateKey.substring(2, privateKey.length)
     }
@@ -225,7 +229,7 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
    * @returns {*|string}
    */
   getAddressType (address, network = 'testnet') {
-    const realNetwork = this._parseNetwork(network)
+    const realNetwork = this.parseNetwork(network)
     let decode
     try {
       decode = this.bitcoinLib.address.fromBase58Check(address)
@@ -256,7 +260,7 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
    * @returns {*|boolean}
    */
   verifyAddressType (address, type = 'p2pkh', network = 'testnet') {
-    const realNetwork = this._parseNetwork(network)
+    const realNetwork = this.parseNetwork(network)
     let decode
     if (type === 'p2pkh') {
       try {
@@ -299,23 +303,23 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
   }
 
   getAddressFromPublicKey(publicKey, type = 'p2pkh', network = 'testnet') {
-    const realNetwork = this._parseNetwork(network)
+    const realNetwork = this.parseNetwork(network)
     if (type === 'p2pkh') {
       // 常规地址
       return this.bitcoinLib.payments.p2pkh({
         pubkey: publicKey.hexToBuffer_(),
-        realNetwork
+        network: realNetwork
       })[`address`]
     } else if (type === 'p2wpkh') {
       return this.bitcoinLib.payments.p2wpkh({
         pubkey: publicKey.hexToBuffer_(),
-        realNetwork
+        network: realNetwork
       })[`address`]
     } else if (type === 'p2sh(p2wpkh)') {
       // 这就是segwit地址，bitcoind的p2sh-segwit参数(p2sh-segwit)
       return this.bitcoinLib.payments.p2sh({
-        redeem: this.bitcoinLib.payments.p2wpkh({ pubkey: publicKey.hexToBuffer_(), realNetwork }),
-        realNetwork
+        redeem: this.bitcoinLib.payments.p2wpkh({ pubkey: publicKey.hexToBuffer_(), network: realNetwork }),
+        network: realNetwork
       })[`address`]
     } else if (type === 'p2wsh(p2ms)') {
       const {pubkeys, m} = publicKey
@@ -323,8 +327,8 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
         return Buffer.from(hex, 'hex')
       })
       return this.bitcoinLib.payments.p2wsh({
-        redeem: this.bitcoinLib.payments.p2ms({ m, pubkeys: pubKeysBuffer, realNetwork }),
-        realNetwork
+        redeem: this.bitcoinLib.payments.p2ms({ m, pubkeys: pubKeysBuffer, network: realNetwork }),
+        network: realNetwork
       })[`address`]
     } else if (type === 'p2sh(p2wsh(p2ms))') {
       const {pubkeys, m} = publicKey
@@ -333,10 +337,10 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
       })
       return this.bitcoinLib.payments.p2sh({
         redeem: this.bitcoinLib.payments.p2wsh({
-          redeem: this.bitcoinLib.payments.p2ms({ m, pubkeys: pubKeysBuffer, realNetwork }),
-          realNetwork
+          redeem: this.bitcoinLib.payments.p2ms({ m, pubkeys: pubKeysBuffer, network: realNetwork }),
+          network: realNetwork
         }),
-        realNetwork
+        network: realNetwork
       })[`address`]
     } else if (type === 'p2sh(p2ms)') {
       // 网上一般用这个
@@ -345,8 +349,8 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
         return Buffer.from(hex, 'hex')
       })
       return this.bitcoinLib.payments.p2sh({
-        redeem: this.bitcoinLib.payments.p2ms({ m, pubkeys: pubKeysBuffer, realNetwork }),
-        realNetwork
+        redeem: this.bitcoinLib.payments.p2ms({ m, pubkeys: pubKeysBuffer, network: realNetwork }),
+        network: realNetwork
       })[`address`]
     } else {
       throw new ErrorHelper('type指定错误')
@@ -360,10 +364,11 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
    * @param network
    */
   getKeyPairFromMint(mintStr, compress = true, network = 'testnet') {
+    const realNetwork = this.parseNetwork(network)
     const afterSha256 = CryptUtil.sha256(mintStr)
     return new this.bitcoinLib.ECPair(BigInteger.fromBuffer(afterSha256.hexToBuffer_()), null, {
       compressed: compress,
-      network: this.bitcoinLib.networks[network]
+      network: realNetwork
     })
   }
 
@@ -480,7 +485,7 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
    * @returns {Promise.<*>}
    */
   buildTransaction(utxos, targets, fee, changeAddress, network = 'testnet', sign = true, version = 2) {
-    const realNetwork = this._parseNetwork(network)
+    const realNetwork = this.parseNetwork(network)
     const txBuilder = new this.bitcoinLib.TransactionBuilder(realNetwork, 3000)
     txBuilder.setVersion(version)
     let totalUtxoBalance = '0'
@@ -614,7 +619,8 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
    * @returns {*}
    */
   outputScriptToAddress(outputScript, network = 'testnet') {
-    return this.bitcoinLib.address.fromOutputScript(outputScript, this.bitcoinLib.networks[network])
+    const realNetwork = this.parseNetwork(network)
+    return this.bitcoinLib.address.fromOutputScript(outputScript, realNetwork)
   }
 
   /**
@@ -655,7 +661,7 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
    * @returns {Promise<void>}
    */
   signTxHex(txHex, utxos, network = 'testnet') {
-    const realNetwork = this._parseNetwork(network)
+    const realNetwork = this.parseNetwork(network)
     const txBuilder = this.bitcoinLib.TransactionBuilder.fromTransaction(this.bitcoinLib.Transaction.fromHex(txHex), realNetwork)
     const buildedTx = this._signUtxos(txBuilder, utxos, realNetwork)
     const inputs = [], outputs = []

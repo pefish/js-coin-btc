@@ -9,5 +9,6 @@ declare class BitcoinWalletHelper extends BaseBitcoinjsLib {
     decimals: number;
     bitcoinLib: any;
     constructor();
+    parseNetwork(network: any): object;
 }
 export default BitcoinWalletHelper;
