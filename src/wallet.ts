@@ -23,8 +23,6 @@ class BitcoinWalletHelper extends BaseBitcoinjsLib {
       return this.bitcoinLib.networks[`bitcoin`]
     } else if (network === `regtest`) {
       return this.bitcoinLib.networks[`regtest`]
-    } else if (network === `test`) {
-      return this.bitcoinLib.networks[`vds`]
     } else {
       throw new ErrorHelper(`network error`)
     }
