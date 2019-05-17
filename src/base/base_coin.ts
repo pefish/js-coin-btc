@@ -14,7 +14,7 @@ abstract class BaseCoin {
    */
   getSeedBufferByMnemonic (mnemonic, pass = '') {
     const bip39Lib = require('bip39')
-    return bip39Lib.mnemonicToSeed(mnemonic, pass) // 种子buffer, password是salt, 默认是'mnemonic'
+    return bip39Lib.mnemonicToSeedSync(mnemonic, pass) // 种子buffer, password是salt, 默认是'mnemonic'
   }
 
   /**
