@@ -13,7 +13,7 @@ class BitcoinWalletHelper extends BaseBitcoinjsLib {
 
   constructor () {
     super()
-    this.bitcoinLib = require('btc-bitcoinjs-lib')
+    this.bitcoinLib = require('@pefish/bitcoinjs-lib')
   }
 
   parseNetwork (network): object {
