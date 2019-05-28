@@ -18,10 +18,10 @@
     esutils "^2.0.2"
     js-tokens "^4.0.0"
 
-"@pefish/bitcoinjs-lib@^5.0.9":
-  version "5.0.9"
-  resolved "https://registry.yarnpkg.com/@pefish/bitcoinjs-lib/-/bitcoinjs-lib-5.0.9.tgz#ba09dd9a225852fc978d80e9d25e9e8ce9bcddc9"
-  integrity sha512-zhUlGyjcJ7v0fJGQVlRKj3zqzLsvCk8WivA2POj4pWU+PTaYUUqAyD7GM+FWHdLcZb68ozwibfBReWIwOEouMg==
+"@pefish/bitcoinjs-lib@^5.2.0":
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/@pefish/bitcoinjs-lib/-/bitcoinjs-lib-5.2.0.tgz#19627c0b6b54cac5b57c6cd56a38de2f9f246ae8"
+  integrity sha512-/sSNzjJ6uLj1x83p1azGq11tCIJIrm3xfdnL0oxit5wij8JmNdE99PxP/2LwtaSpnKjgYBHma+16o1WXuEjFXQ==
   dependencies:
     "@types/node" "10.12.18"
     bech32 "^1.1.2"
