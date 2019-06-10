@@ -1,7 +1,7 @@
 /** @module */
-import 'js-node-assist'
+import '@pefish/js-node-assist'
 import BaseBitcoinjsLib from './base/base_bitcoinjs_lib'
-import ErrorHelper from 'p-js-error'
+import ErrorHelper from '@pefish/js-error'
 
 /**
  * 比特币钱包帮助类

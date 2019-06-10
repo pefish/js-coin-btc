@@ -1,5 +1,5 @@
 /** @module */
-import 'js-node-assist';
+import '@pefish/js-node-assist';
 /**
  * bitcoin rpc调用工具
  */

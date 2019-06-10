@@ -1,5 +1,5 @@
 /** @module */
-import 'js-node-assist';
+import '@pefish/js-node-assist';
 import BaseBitcoinjsLib from './base/base_bitcoinjs_lib';
 /**
  * 比特币钱包帮助类

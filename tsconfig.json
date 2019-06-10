@@ -11,12 +11,10 @@
     "sourceMap": true,
     "outDir": "lib",
     "baseUrl": ".",
-    "typeRoots": [
-      "node_modules/@types",
-      "node_modules/js-node-assist/types"
-    ],
     "lib": [
-      "ES2015"
+      "ES2015",
+      "ES2016",
+      "ES2017"
     ],
     "allowSyntheticDefaultImports": true
   },

@@ -1,1 +1,1 @@
-import 'js-node-assist';
+import '@pefish/js-node-assist';

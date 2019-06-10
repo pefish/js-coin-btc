@@ -1,4 +1,4 @@
-import 'js-node-assist'
+import '@pefish/js-node-assist'
 import BitcoinWalletHelper from './wallet'
 import assert from 'assert'
 

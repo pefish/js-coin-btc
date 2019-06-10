@@ -119,7 +119,7 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
      * @param network
      */
     getKeyPairFromMint(mintStr: any, compress?: boolean, network?: string): any;
-    getPrivateKeyFromMint(mintStr: any): any;
+    getPrivateKeyFromMint(mintStr: any): string;
     /**
      * 由私钥和path推导出下级节点的所有信息，path中带有'的地址称为hardened address
      * @param xpriv

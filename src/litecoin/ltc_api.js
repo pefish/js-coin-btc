@@ -1,5 +1,5 @@
-import HttpRequestUtil from 'p-js-utils/lib/http_request'
-import ErrorHelper from 'p-js-error'
+import HttpRequestUtil from '@pefish/js-util-httprequest'
+import ErrorHelper from '@pefish/js-error'
 
 export default class LtcApiHelper {
   constructor (url) {

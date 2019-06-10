@@ -1,7 +1,7 @@
 import BaseCoin from './base_coin'
-import ErrorHelper from 'p-js-error'
+import ErrorHelper from '@pefish/js-error'
 import BigInteger from 'bigi'
-import CryptUtil from 'p-js-utils/lib/crypt'
+import crypto from 'crypto'
 
 /**
  * 比特币系基类
@@ -365,7 +365,7 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
    */
   getKeyPairFromMint(mintStr, compress = true, network = 'testnet') {
     const realNetwork = this.parseNetwork(network)
-    const afterSha256 = CryptUtil.sha256(mintStr)
+    const afterSha256 = crypto.createHash('sha256').update(mintStr).digest('hex')
     return new this.bitcoinLib.ECPair(BigInteger.fromBuffer(afterSha256.hexToBuffer_()), null, {
       compressed: compress,
       network: realNetwork
@@ -373,7 +373,7 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
   }
 
   getPrivateKeyFromMint(mintStr) {
-    return CryptUtil.sha256(mintStr)
+    return crypto.createHash('sha256').update(mintStr).digest('hex')
   }
 
   /**
