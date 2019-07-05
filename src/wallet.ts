@@ -2,6 +2,7 @@
 import '@pefish/js-node-assist'
 import BaseBitcoinjsLib from './base/base_bitcoinjs_lib'
 import ErrorHelper from '@pefish/js-error'
+import Remote, { RemoteConfig } from './remote'
 
 /**
  * 比特币钱包帮助类
@@ -10,10 +11,15 @@ import ErrorHelper from '@pefish/js-error'
 class BitcoinWalletHelper extends BaseBitcoinjsLib {
   decimals: number = 8
   bitcoinLib: any
+  remoteClient: Remote
 
   constructor () {
     super()
     this.bitcoinLib = require('@pefish/bitcoinjs-lib')
+  }
+
+  initRemoteClient (config: RemoteConfig): void {
+    this.remoteClient = new Remote(config)
   }
 
   parseNetwork (network): object {
