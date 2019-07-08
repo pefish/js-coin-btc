@@ -1,6 +1,6 @@
 {
   "name": "@pefish/js-coin-btc",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "btc tool of js",
   "keywords": [
     "common",
@@ -29,15 +29,9 @@
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.6",
     "@types/node": "^11.13.7",
-    "bcc-bitcoinjs-lib": "^3.1.8",
-    "bchaddrjs": "^0.2.1",
-    "dashcore-lib": "^8.2.3",
-    "ltc-bitcoinjs-lib": "^3.3.10",
     "ts-node": "^8.1.0",
     "tslint": "^5.16.0",
-    "typescript": "^3.4.5",
-    "uload-bitcoinjs-lib": "^3.3.5",
-    "ulord-bitcore-lib": "^0.2.1"
+    "typescript": "^3.4.5"
   },
   "dependencies": {
     "@pefish/bitcoinjs-lib": "^5.2.0",
