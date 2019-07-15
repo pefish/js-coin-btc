@@ -1,6 +1,6 @@
 {
   "name": "@pefish/js-coin-btc",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "btc tool of js",
   "keywords": [
     "common",
@@ -21,7 +21,8 @@
   },
   "scripts": {
     "build": "rm -rf lib && rm -rf types && tsc && yarn tslint",
-    "test": "mocha --timeout 6000 --require ts-node/register tests/*.test.js",
+    "test": "mocha --timeout 6000 --require ts-node/register src/**/*.test.ts",
+    "t": "mocha --timeout 6000 --require ts-node/register",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
     "prepublish": "yarn build"
   },
