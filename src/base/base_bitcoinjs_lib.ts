@@ -345,7 +345,7 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
     } else if (type === 'p2sh(p2ms)') {
       // 网上一般用这个
       const {pubkeys, m} = publicKey
-      const pubKeysBuffer = pubkeys.map((hex) => {  // pubkeys顺序不一样，生成的地址也不一样
+      const pubKeysBuffer = pubkeys.map((hex) => {  // pubkeys顺序不一样，生成的地址也不一样，签名时必须按照同样的顺序依次签名
         return Buffer.from(hex, 'hex')
       })
       return this.bitcoinLib.payments.p2sh({
