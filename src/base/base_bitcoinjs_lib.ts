@@ -345,7 +345,7 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
     } else if (type === 'p2sh(p2ms)') {
       // 网上一般用这个
       const {pubkeys, m} = publicKey
-      const pubKeysBuffer = pubkeys.map((hex) => {  // pubkeys顺序不一样，生成的地址也不一样，签名时必须按照同样的顺序依次签名
+      const pubKeysBuffer = pubkeys.map((hex) => {  // pubkeys顺序不一样，生成的地址也不一样，签名时pubkeys的顺序也必须是这样，参与者的签名顺序无关
         return Buffer.from(hex, 'hex')
       })
       return this.bitcoinLib.payments.p2sh({
@@ -701,7 +701,7 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
   /**
    * 对utxo签名
    * @param txBuilder
-   * @param utxos {array} wif [type] [balance] [pubkeys] [m]
+   * @param utxos {array} wif [type] [balance] [pubkeys] [m]  pubkeys的顺序必须是生成多签地址时的顺序
    * @param network
    * @returns {*|Transaction}
    * @private
