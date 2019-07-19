@@ -1,5 +1,4 @@
 import '@pefish/js-node-assist'
-import BitcoinRpcUtil from './rpc'
 import assert from 'assert'
 import Remote from "./remote";
 

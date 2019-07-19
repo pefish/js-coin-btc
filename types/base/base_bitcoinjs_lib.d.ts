@@ -223,7 +223,7 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
     /**
      * 对utxo签名
      * @param txBuilder
-     * @param utxos {array} wif [type] [balance] [pubkeys] [m]
+     * @param utxos {array} wif [type] [balance] [pubkeys] [m]  pubkeys的顺序必须是生成多签地址时的顺序
      * @param network
      * @returns {*|Transaction}
      * @private
