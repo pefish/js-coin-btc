@@ -1,4 +1,5 @@
 import BaseCoin from './base_coin'
+import ErrorHelper from '@pefish/js-error'
 
 export default abstract class BaseBitcoreLib extends BaseCoin {
   public abstract decimals: number
@@ -44,50 +45,28 @@ export default abstract class BaseBitcoreLib extends BaseCoin {
   }
 
   /**
-   * 根据wif获取address
-   * @param wif {string}
-   * @param network
-   */
-  getAddressFromWif(wif, network = 'testnet') {
-    const privateKeyObj = this.bitcoinLib.PrivateKey.fromWIF(wif)
-    const publicKeyObj = privateKeyObj.toPublicKey()
-    return publicKeyObj.toAddress(network).toString()
-  }
-
-  // getAddressfromScriptHash(wif, network = 'testnet') {
-  //   const privateKeyObj = this.bitcoinLib.PrivateKey.fromWIF(wif)
-  //   const publicKeyObj = privateKeyObj.toPublicKey()
-  //   const scriptHash = this.bitcoinLib.Address.fromScriptHash(new Buffer(publicKeyObj.toString(), 'hex'), network)
-  // }
-
-  /**
    * 生成交易, 单位satoshi
-   * @param utxos {array} balance使用satoshi数值string, index使用number. { wif, txid, index/vout, balance/amount[, sequence][, type][, pubkeys] }
+   * @param utxos {array} balance使用satoshi数值string, index使用number. { wif, txid, script, index/vout, balance/amount[, sequence][, type][, pubkeys] }
    * @param targets {array} 为[]则全部钱打给changeAddress { address, amount[, msg] }
    * @param fee {string} satoshi string
    * @param changeAddress {string} 找零地址
-   * @param network {string}
-   * @param sign {boolean}
-   * @param version {number}
    * @returns {Promise.<*>}
    */
-  buildTransaction(utxos, targets, fee, changeAddress, network = 'testnet', sign = true, version = 2) {
-    const newUtxos = [], privateKeys = [], outputWithIndex = []
-    let totalUtxoBalance = '0', targetTotalAmount = '0', changeAmount = `0`
+  buildTransaction(utxos, targets, fee, changeAddress) {
+    const newUtxos = [], privateKeys = []
+    let totalUtxoBalance = '0', targetTotalAmount = '0'
     for (const utxo of utxos) {
       let { index, balance: satoshis} = utxo
-      const { txid, wif } = utxo
+      const { txid, wif, script } = utxo
       privateKeys.push(this.bitcoinLib.PrivateKey.fromWIF(wif))
       index = (index === undefined ? utxo['vout'] : index)
-      satoshis = (satoshis === undefined ? utxo['amount'].shiftedBy(this.decimals) : satoshis)
-      const address = this.getAddressFromWif(wif, network)
-      const script = this.bitcoinLib.Script.buildPublicKeyHashOut(address).toString()
+      satoshis = (satoshis === undefined ? utxo['amount'].shiftedBy_(this.decimals) : satoshis)
       totalUtxoBalance = totalUtxoBalance.add_(satoshis)
       newUtxos.push({
         txid: txid,
         outputIndex: index,
-        satoshis: satoshis.toNumber(),
-        script: script
+        satoshis: satoshis.toNumber_(),
+        script,
       })
     }
     const targetData = []
@@ -95,40 +74,17 @@ export default abstract class BaseBitcoreLib extends BaseCoin {
       const target = targets[i]
       targetData.push({
         address: target.address,
-        satoshis: target.amount.toNumber()
+        satoshis: target.amount.toNumber_()
       })
       targetTotalAmount = targetTotalAmount.add_(target.amount)
-      outputWithIndex.push({
-        index: i,
-        address: target.address,
-        amount: target.amount,
-        ref_id: target.ref_id
-      })
     }
-    if (fee.lt(1000)) {
+    if (fee.lt_(1000)) {
       fee = '1000'
     }
-    const transaction = this.bitcoinLib.Transaction().from(newUtxos).to(targetData).fee(fee.toNumber()).change(changeAddress).sign(privateKeys)
-    // 添加找零的输出
-    changeAmount = totalUtxoBalance.sub_(targetTotalAmount).sub_(fee.toString())
-    if (changeAmount !== '0') {
-      const amount = totalUtxoBalance.sub_(targetTotalAmount).sub_(fee.toString()).toNumber_()
-      outputWithIndex.push({
-        address: changeAddress,
-        amount,
-        index: targets.length,
-      })
-    }
-    const changeAmountReturn = transaction.getChangeOutput() ? transaction.getChangeOutput().satoshis.toString() : '0'
-    const Fee = transaction.getFee().toString()
+    const transaction = this.bitcoinLib.Transaction().from(newUtxos).to(targetData).fee(fee.toNumber_()).change(changeAddress).sign(privateKeys)
     return {
       txHex: transaction.toString(),
       txId: transaction.id,
-      fee,
-      outputWithIndex,
-      inputAmount: transaction.inputAmount.toString(),
-      changeAmount: changeAmountReturn,
-      outputAmount: transaction.inputAmount.toString().sub(changeAmountReturn).sub(Fee).toString()
     }
   }
 
