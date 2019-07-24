@@ -1,8 +1,7 @@
 import BitcoinWalletHelper from "../src/wallet";
+import assert from "assert";
 
-let temp = `5`
-if (temp.length % 2 !== 0) {
-  temp = '0' + temp
-}
-
-console.log(Buffer.from(temp, 'hex'))
+const walletHelper = new BitcoinWalletHelper()
+const result = walletHelper.getAllFromWif('KxssBSfj5fpRSz9JzUAorL9aNansgNGLEUA8tXMLm4fTCfUAWnQu', `mainnet`)
+const p2pkh = walletHelper.getAddressFromPublicKey(result[`publicKey`], `p2pkh`, `mainnet`)
+global.logger.error(p2pkh)

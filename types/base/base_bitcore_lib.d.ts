@@ -28,30 +28,16 @@ export default abstract class BaseBitcoreLib extends BaseCoin {
         wif: any;
     };
     /**
-     * 根据wif获取address
-     * @param wif {string}
-     * @param network
-     */
-    getAddressFromWif(wif: any, network?: string): any;
-    /**
      * 生成交易, 单位satoshi
-     * @param utxos {array} balance使用satoshi数值string, index使用number. { wif, txid, index/vout, balance/amount[, sequence][, type][, pubkeys] }
+     * @param utxos {array} balance使用satoshi数值string, index使用number. { wif, txid, script, index/vout, balance/amount[, sequence][, type][, pubkeys] }
      * @param targets {array} 为[]则全部钱打给changeAddress { address, amount[, msg] }
      * @param fee {string} satoshi string
      * @param changeAddress {string} 找零地址
-     * @param network {string}
-     * @param sign {boolean}
-     * @param version {number}
      * @returns {Promise.<*>}
      */
-    buildTransaction(utxos: any, targets: any, fee: any, changeAddress: any, network?: string, sign?: boolean, version?: number): {
+    buildTransaction(utxos: any, targets: any, fee: any, changeAddress: any): {
         txHex: any;
         txId: any;
-        fee: any;
-        outputWithIndex: any[];
-        inputAmount: any;
-        changeAmount: any;
-        outputAmount: any;
     };
     /**
      * 校验地址

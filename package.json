@@ -1,6 +1,6 @@
 {
   "name": "@pefish/js-coin-btc",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "description": "btc tool of js",
   "keywords": [
     "common",
@@ -11,7 +11,8 @@
   "bugs": "https://github.com/pefish/js-btc/issues",
   "license": "MIT",
   "author": "pefish",
-  "types": "./types/*.d.ts",
+  "types": "./types/index.d.ts",
+  "main": "./lib/index.js",
   "engines": {
     "node": "*"
   },
@@ -35,9 +36,9 @@
   },
   "dependencies": {
     "@pefish/bitcoinjs-lib": "^5.2.0",
-    "@pefish/js-error": "^0.0.5",
-    "@pefish/js-node-assist": "^0.6.2",
-    "@pefish/js-util-httprequest": "^0.0.5",
+    "@pefish/js-error": "^0.1.1",
+    "@pefish/js-node-assist": "^0.6.6",
+    "@pefish/js-util-httprequest": "^0.0.8",
     "bigi": "^1.4.2",
     "bip39": "^3.0.2",
     "bitcoin-core": "^2.0.0"
