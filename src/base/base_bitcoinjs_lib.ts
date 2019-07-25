@@ -311,6 +311,7 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
         network: realNetwork
       })[`address`]
     } else if (type === 'p2wpkh') {
+      // bitcoind的bech32参数
       return this.bitcoinLib.payments.p2wpkh({
         pubkey: publicKey.hexToBuffer_(),
         network: realNetwork

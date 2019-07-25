@@ -213,6 +213,24 @@ describe('bitcoinWalletHelper', () => {
     }
   })
 
+  it('getAddressFromWif', async () => {
+    try {
+      const result = walletHelper.getAllFromWif('KwyadqQkPHVkQsreCS2dVrHBQE79TNiDHPjrP9aTL8Zc9BWrf4U6', mainnet)
+      const p2pkh = walletHelper.getAddressFromPublicKey(result[`publicKey`], `p2pkh`, mainnet)
+      // global.logger.error(p2pkh)
+      assert.strictEqual(p2pkh, `1LKz7cLQVSTzPdg8yP1pbKU1hiYSXtvnWK`)
+      const p2wpkh = walletHelper.getAddressFromPublicKey(result[`publicKey`], `p2wpkh`, mainnet)
+      // global.logger.error(p2wpkh)
+      assert.strictEqual(p2wpkh, `bc1q6sqcmdp8ql5c6wkapqyhppqkk36gdhxsdu2ek6`)
+      const segwit = walletHelper.getAddressFromPublicKey(result[`publicKey`], `p2sh(p2wpkh)`, mainnet)
+      // global.logger.error(segwit)
+      assert.strictEqual(segwit, `3MJZpHDFq6kBuPYvePvw1F7tDefwexuFSF`)
+    } catch (err) {
+      global.logger.error(err)
+      assert.throws(() => {}, err)
+    }
+  })
+
   it('getAddressFromPublicKey p2wsh(p2ms)', async () => {
     try {
       const result1 = walletHelper.getAddressFromPublicKey({
