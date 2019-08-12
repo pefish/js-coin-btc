@@ -3,9 +3,9 @@ import { BIP32Interface } from 'bip32';
 import { Network, Transaction, TransactionBuilder } from '@pefish/bitcoinjs-lib';
 import { ECPairInterface } from '@pefish/bitcoinjs-lib/types/ecpair';
 interface Utxo {
-    txid: string;
+    txid?: string;
     wif: string | string[];
-    index: number;
+    index?: number;
     balance: string;
     sequence?: number;
     type?: string;

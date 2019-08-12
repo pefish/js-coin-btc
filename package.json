@@ -40,7 +40,9 @@
     "@pefish/js-node-assist": "^0.6.6",
     "@pefish/js-util-httprequest": "^0.0.8",
     "bigi": "^1.4.2",
+    "bip32": "^2.0.4",
     "bip39": "^3.0.2",
-    "bitcoin-core": "^2.0.0"
+    "bitcoin-core": "^2.0.0",
+    "bs58check": "^2.1.2"
   }
 }
