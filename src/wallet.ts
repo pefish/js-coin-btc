@@ -3,7 +3,8 @@ import '@pefish/js-node-assist'
 import BaseBitcoinjsLib from './base/base_bitcoinjs_lib'
 import ErrorHelper from '@pefish/js-error'
 import Remote, { RemoteConfig } from './remote'
-import { Network } from '@pefish/bitcoinjs-lib';
+import * as bitcoinLib from '@pefish/bitcoinjs-lib';
+import { Network } from '@pefish/bitcoinjs-lib'
 
 /**
  * 比特币钱包帮助类
@@ -16,7 +17,7 @@ class BitcoinWalletHelper extends BaseBitcoinjsLib {
 
   constructor () {
     super()
-    this.bitcoinLib = require('@pefish/bitcoinjs-lib')
+    this.bitcoinLib = bitcoinLib
   }
 
   initRemoteClient (config: RemoteConfig): void {
