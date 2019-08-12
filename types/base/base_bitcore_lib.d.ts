@@ -9,7 +9,7 @@ export default abstract class BaseBitcoreLib extends BaseCoin {
      * @param network
      * @returns {*}
      */
-    getHdPrivateKeyBySeed(seed: any, network?: string): any;
+    getHdPrivateKeyBySeed(seed: string, network?: string): any;
     /**
      *
      * @param seed {string} 不带

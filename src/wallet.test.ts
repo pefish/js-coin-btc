@@ -12,7 +12,7 @@ declare global {
 
 describe('bitcoinWalletHelper', () => {
 
-  let walletHelper
+  let walletHelper: BitcoinWalletHelper
   const testnet = 'testnet', mainnet = 'mainnet'
 
   before(async () => {
@@ -371,7 +371,6 @@ describe('bitcoinWalletHelper', () => {
         ],
         [
           {
-            'ref': 1,
             'address': '2My1UpKsy9ZTRxEac9B5NC3BrUKqx5CCppp',
             'amount': '1000000'
           }

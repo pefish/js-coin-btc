@@ -1,5 +1,4 @@
 import BaseCoin from './base_coin'
-import ErrorHelper from '@pefish/js-error'
 
 export default abstract class BaseBitcoreLib extends BaseCoin {
   public abstract decimals: number
@@ -15,7 +14,7 @@ export default abstract class BaseBitcoreLib extends BaseCoin {
    * @param network
    * @returns {*}
    */
-  getHdPrivateKeyBySeed(seed, network = 'testnet') {
+  getHdPrivateKeyBySeed(seed: string, network: string = 'testnet') {
     return this.bitcoinLib.HDPrivateKey.fromSeed(seed, network)
   }
 

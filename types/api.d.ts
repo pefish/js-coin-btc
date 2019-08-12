@@ -1,11 +1,11 @@
 export default class BtcApiHelper {
-    _baseUrl: string;
-    _token: string;
+    baseUrl: string;
+    token: string;
     constructor(url: any, token?: string);
-    _buildFullUrl(path: any): string;
-    sendRawTransaction(txHex: any): Promise<boolean>;
-    getAddressInfo(address: any): Promise<any>;
-    getBalance(address: any, zeroConfirmation?: boolean): Promise<any>;
-    getUnconfirmedTxs(): Promise<any>;
+    private buildFullUrl;
+    sendRawTransaction(txHex: string): Promise<void>;
+    getAddressInfo(address: string): Promise<any>;
+    getBalance(address: string, zeroConfirmation?: boolean): Promise<string>;
+    getUnconfirmedTxs(): Promise<any[]>;
     getChainInfo(): Promise<any>;
 }

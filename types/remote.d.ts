@@ -10,5 +10,5 @@ export interface RemoteConfig {
 export default class Remote {
     client: Client;
     constructor(rpcConfig: RemoteConfig);
-    request(method: any, params: any): Promise<any>;
+    request(method: string, params: any[]): Promise<any>;
 }

@@ -11,48 +11,48 @@ describe('BtcApiHelper', () => {
     helper = new BtcApiHelper('https://api.blockcypher.com/v1/btc/test3')
   })
 
-  // it('sendRawTransaction', async () => {
+  it('sendRawTransaction', async () => {
+    try {
+      const result = await helper.sendRawTransaction('0200000004801e33fe04d54a3d051f38dc28acce33408e70533c3ea3903003fa2ab3b17279030000006a473044022042f44ceb0b6ad5ad5f401229249cfc7e3858f8476ee8517daa50dffbfb1f26d80220764c042c50c9c90b3872ee8d3d685414b4ce7c3e8a8172f3eebdfd19699b4760012103bf7ca83b3abcf9c4c6da8fcb407e34814bb39a0a463e0937834bfc69ad2f70aefeffffff801e33fe04d54a3d051f38dc28acce33408e70533c3ea3903003fa2ab3b17279060000006a47304402202d11329571849c8f797a5f40f5fc107878767d603a914e558f20fa577bea23f1022061403f01537accdf41d979e3cbf2ca8dbc0b67e1ba1da128fa158daa4f111e2a012103d89549a603de3252c37c8e0894557c998677ea7e8cdc3a5404d8cae928c826c1feffffff5dfa3b2752e1ef9272045dd0501b0118e3673184f3b628326e29b61156850970010000006a47304402200eedd5fe79da51d2f1584af606bdca7159d6b6b764061b00a03c0c372e3d798b022047bb71775f2291ff2706791f1b1392cb4334ce1cd7f58bfe0a303ea7b555a32c012102470bca296acb595316d59874bfad6a67e707f64b6a16032fbe45325a5fd2f36efeffffff801e33fe04d54a3d051f38dc28acce33408e70533c3ea3903003fa2ab3b17279000000006a47304402206b248023aae77381d688b545163ab24d3ef974c1fa62a7f3ae5288fc0b61ba8a022076c028e93406567739c944d2a80ed7c8ea345b7565bd92512122b4c5f76f322b01210319765746013ba8cfea4e1f3a5b5d7fce1e406bd158b90aa03d3d5ff7428569affeffffff01b0f5e01a0000000017a9148d5ead745127f0fdd0f8b4c3bf3987f90f75cc348700000000')
+      global.logger.error(result)
+      // assert.notStrictEqual(result, undefined)
+    } catch (err) {
+      global.logger.error(err)
+      assert.throws(() => {}, err)
+    }
+  })
+
+  // it('getAddressInfo', async () => {
   //   try {
-  //     const result = await helper.sendRawTransaction('0200000000010176931c705ffa2ce17280a5c03d1a3df00de1c814cb8e4910cc5f63bf2e2da23102000000171600149ff0c2908fba5260b78b548e570f0bd319ac789affffffff03888a01000000000017a9146c567b082bde34c520bdebff3899fb743ab04ae687708e01000000000017a9146c567b082bde34c520bdebff3899fb743ab04ae687c69b65280000000017a914c80fda0d07bff0f579849ade15848adbbe0ba693870247304402204e9596a5b4cf00a8dd1b35224ff320c00c360dc4708552540c904051a3df299402203d2a334ebce4f02d123324071aaf1bb1ed247535246cd990bc9db0f07522380901210284f4b79e680518bb8f6f268e2d59a18aa1927c2ebd51355b15021d18e0e4496800000000')
-  //     // logger.error(result)
+  //     const result = await helper.getAddressInfo('2NBV483qX29Zd7yCPUUmUCCXpLnu51EExwP')
+  //     global.logger.error('1', result)
   //     // assert.notStrictEqual(result, undefined)
   //   } catch (err) {
-  //     logger.error(err)
+  //     global.logger.error(err)
   //     assert.throws(() => {}, err)
   //   }
   // })
 
-  it('getAddressInfo', async () => {
-    try {
-      const result = await helper.getAddressInfo('2NBV483qX29Zd7yCPUUmUCCXpLnu51EExwP')
-      global.logger.error('1', result)
-      // assert.notStrictEqual(result, undefined)
-    } catch (err) {
-      global.logger.error(err)
-      assert.throws(() => {}, err)
-    }
-  })
+  // it('getBalance', async () => {
+  //   try {
+  //     const result = await helper.getBalance('2NBV483qX29Zd7yCPUUmUCCXpLnu51EExwP')
+  //     global.logger.error('2', result)
+  //     // assert.notStrictEqual(result, undefined)
+  //   } catch (err) {
+  //     global.logger.error(err)
+  //     assert.throws(() => {}, err)
+  //   }
+  // })
 
-  it('getBalance', async () => {
-    try {
-      const result = await helper.getBalance('2NBV483qX29Zd7yCPUUmUCCXpLnu51EExwP')
-      global.logger.error('2', result)
-      // assert.notStrictEqual(result, undefined)
-    } catch (err) {
-      global.logger.error(err)
-      assert.throws(() => {}, err)
-    }
-  })
-
-  it('getChainInfo', async () => {
-    try {
-      const result = await helper.getChainInfo()
-      global.logger.error('3', result)
-      // assert.notStrictEqual(result, undefined)
-    } catch (err) {
-      global.logger.error(err)
-      assert.throws(() => {}, err)
-    }
-  })
+  // it('getChainInfo', async () => {
+  //   try {
+  //     const result = await helper.getChainInfo()
+  //     global.logger.error('3', result)
+  //     // assert.notStrictEqual(result, undefined)
+  //   } catch (err) {
+  //     global.logger.error(err)
+  //     assert.throws(() => {}, err)
+  //   }
+  // })
 })
 

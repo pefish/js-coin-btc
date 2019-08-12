@@ -11,18 +11,18 @@ declare abstract class BaseCoin {
      * @param pass
      * @returns {string} 128位hex字符串
      */
-    getSeedBufferByMnemonic(mnemonic: any, pass?: string): any;
+    getSeedBufferByMnemonic(mnemonic: string, pass?: string): Buffer;
     /**
      * 根据助记码得到seed hex
      * @param mnemonic
      * @param pass
      * @returns {string}
      */
-    getSeedHexByMnemonic(mnemonic: any, pass?: string): any;
+    getSeedHexByMnemonic(mnemonic: string, pass?: string): string;
     /**
      * 根据字典生成随机助记码
      * @returns {*}
      */
-    getRandomMnemonic(): any;
+    getRandomMnemonic(): string;
 }
 export default BaseCoin;

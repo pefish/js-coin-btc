@@ -3,6 +3,7 @@ import '@pefish/js-node-assist'
 import BaseBitcoinjsLib from './base/base_bitcoinjs_lib'
 import ErrorHelper from '@pefish/js-error'
 import Remote, { RemoteConfig } from './remote'
+import { Network } from '@pefish/bitcoinjs-lib';
 
 /**
  * 比特币钱包帮助类
@@ -22,7 +23,7 @@ class BitcoinWalletHelper extends BaseBitcoinjsLib {
     this.remoteClient = new Remote(config)
   }
 
-  parseNetwork (network): object {
+  parseNetwork (network: string): Network {
     if (network === `testnet`) {
       return this.bitcoinLib.networks[`testnet`]
     } else if (network === `mainnet`) {

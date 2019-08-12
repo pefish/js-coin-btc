@@ -17,7 +17,7 @@ export default class Remote {
     this.client = new Client(rpcConfig)
   }
 
-  async request (method, params) {
+  async request (method: string, params: any[]): Promise<any> {
     return this.client.command(method, ...params)
   }
 }
