@@ -8,7 +8,7 @@ import { Network, Transaction, TransactionBuilder } from '@pefish/bitcoinjs-lib'
 import { ECPairInterface } from '@pefish/bitcoinjs-lib/types/ecpair';
 import { validateMnemonic, mnemonicToSeedSync, generateMnemonic } from 'bip39'
 
-interface Utxo { txid?: string, wif: string | string[], index?: number, balance: string, sequence?: number, type?: string, pubkeys?: string[], m?: number}
+export interface Utxo { txid?: string, wif: string | string[], index?: number, balance: string, sequence?: number, type?: string, pubkeys?: string[], m?: number}
 
 /**
  * 比特币系基类
