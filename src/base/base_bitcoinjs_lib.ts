@@ -448,8 +448,8 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
 
   /**
    * 生成交易, 单位satoshi
-   * @param utxos {array} balance使用satoshi数值string, index使用number. { wif, txid, index/vout, balance/amount[, sequence][, type][, pubkeys] }
-   * @param targets {array} 为[]则全部钱打给changeAddress { address, amount[, msg] }
+   * @param utxos {array} balance使用satoshi数值string, index使用number.
+   * @param targets {array} 为[]则全部钱打给changeAddress 
    * @param fee {string} satoshi string
    * @param changeAddress {string} 找零地址. 没有零钱的话，这个字段不生效
    * @param network {string}
@@ -631,11 +631,17 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
   /**
    * 签名原生交易
    * @param txHex
-   * @param utxos {array} { wif[, balance][, type][, pubkeys] } 对多签地址utxo的签名的顺序不影响交易
+   * @param utxos 对多签地址utxo的签名的顺序不影响交易
    * @param network
    * @returns {Promise<void>}
    */
-  signTxHex(txHex: string, utxos: Utxo[], network: string = 'testnet') {
+  signTxHex(txHex: string, utxos: Utxo[], network: string = 'testnet'): {
+    txHex: string;
+    txId: string;
+    inputs: { hash: string, index: number, sequence: number }[];
+    outputs: { value: string, index: number, address: string, script: string }[];
+    outputAmount: string;
+  } {
     const realNetwork = this.parseNetwork(network)
     const txBuilder = this.bitcoinLib.TransactionBuilder.fromTransaction(this.bitcoinLib.Transaction.fromHex(txHex), realNetwork)
     const buildedTx = this._signUtxos(txBuilder, utxos, realNetwork)
