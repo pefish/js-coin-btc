@@ -1,7 +1,7 @@
 import BaseCoin from './base_coin';
 import { BIP32Interface } from 'bip32';
-import { Network, Transaction, TransactionBuilder } from '@pefish/bitcoinjs-lib';
-import { ECPairInterface } from '@pefish/bitcoinjs-lib/types/ecpair';
+import { Network, Transaction, TransactionBuilder } from 'bitcoinjs-lib';
+import { ECPairInterface } from 'bitcoinjs-lib/types/ecpair';
 export interface Utxo {
     txid?: string;
     wif: string | string[];

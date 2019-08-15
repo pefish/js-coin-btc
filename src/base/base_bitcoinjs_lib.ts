@@ -4,8 +4,8 @@ import BigInteger from 'bigi'
 import crypto from 'crypto'
 import { BIP32Interface, fromBase58, fromSeed } from 'bip32'
 import b58 from 'bs58check'
-import { Network, Transaction, TransactionBuilder } from '@pefish/bitcoinjs-lib';
-import { ECPairInterface } from '@pefish/bitcoinjs-lib/types/ecpair';
+import { Network, Transaction, TransactionBuilder } from 'bitcoinjs-lib';
+import { ECPairInterface } from 'bitcoinjs-lib/types/ecpair';
 import { validateMnemonic, mnemonicToSeedSync, generateMnemonic } from 'bip39'
 
 export interface Utxo { txid?: string, wif: string | string[], index?: number, balance: string, sequence?: number, type?: string, pubkeys?: string[], m?: number}

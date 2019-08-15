@@ -3,8 +3,8 @@ import '@pefish/js-node-assist'
 import BaseBitcoinjsLib from './base/base_bitcoinjs_lib'
 import ErrorHelper from '@pefish/js-error'
 import Remote, { RemoteConfig } from './remote'
-import * as bitcoinLib from '@pefish/bitcoinjs-lib';
-import { Network } from '@pefish/bitcoinjs-lib'
+import * as bitcoinLib from 'bitcoinjs-lib';
+import { Network } from 'bitcoinjs-lib'
 
 /**
  * 比特币钱包帮助类
