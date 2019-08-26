@@ -5,14 +5,14 @@ export default class BtcApiHelper {
   baseUrl: string
   token: string
 
-  constructor (url, token = '') {
+  constructor (url: string, token: string = null) {
     // this._baseUrl = (network === 'testnet' ? 'https://api.blockcypher.com/v1/btc/test3' : 'https://api.blockcypher.com/v1/btc/main')
     this.baseUrl = url
     this.token = token
   }
 
   private buildFullUrl (path: string): string {
-    return `${this.baseUrl}${path}?token=${this.token}`
+    return `${this.baseUrl}${path}` + this.token ? `?token=${this.token}` : ''
   }
 
   async sendRawTransaction (txHex: string) {
@@ -25,7 +25,7 @@ export default class BtcApiHelper {
   }
 
   async getAddressInfo (address: string): Promise<any> {
-    const result = await HttpRequestUtil.getJson(this.buildFullUrl(`/addrs/${address}`), null, {})
+    const result = await HttpRequestUtil.getJson(this.buildFullUrl(`/addrs/${address}`))
     if (result['error']) {
       throw new ErrorHelper(result['error']['message'])
     }
@@ -33,15 +33,15 @@ export default class BtcApiHelper {
   }
 
   async getBalance (address: string, zeroConfirmation: boolean = true): Promise<string> {
-    const result = await HttpRequestUtil.getJson(this.buildFullUrl(`/addrs/${address}/balance`), null, {})
+    const result = await HttpRequestUtil.getJson(this.buildFullUrl(`/addrs/${address}/balance`))
     if (result['error']) {
       throw new ErrorHelper(result['error']['message'])
     }
-    return zeroConfirmation === true ? result['balance'].toString().add(result['unconfirmed_balance']) : result['balance'].toString()
+    return zeroConfirmation === true ? result['balance'].toString().add_(result['unconfirmed_balance']) : result['balance'].toString()
   }
 
   async getUnconfirmedTxs (): Promise<any[]> {
-    const result = await HttpRequestUtil.getJson(this.buildFullUrl(`/txs`), null, {})
+    const result = await HttpRequestUtil.getJson(this.buildFullUrl(`/txs`))
     if (result['error']) {
       throw new ErrorHelper(result['error']['message'])
     }
@@ -49,7 +49,7 @@ export default class BtcApiHelper {
   }
 
   async getChainInfo (): Promise<any> {
-    const result = await HttpRequestUtil.getJson(this.buildFullUrl(''), null, {})
+    const result = await HttpRequestUtil.getJson(this.buildFullUrl(''))
     if (result['error']) {
       throw new ErrorHelper(result['error']['message'])
     }
