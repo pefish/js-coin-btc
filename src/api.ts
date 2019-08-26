@@ -12,7 +12,7 @@ export default class BtcApiHelper {
   }
 
   private buildFullUrl (path: string): string {
-    return `${this.baseUrl}${path}` + this.token ? `?token=${this.token}` : ''
+    return `${this.baseUrl}${path}` + (this.token ? `?token=${this.token}` : '')
   }
 
   async sendRawTransaction (txHex: string) {
