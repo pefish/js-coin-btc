@@ -4,7 +4,7 @@ import BtcApiHelper from './api'
 
 describe('BtcApiHelper', () => {
 
-  let helper
+  let helper: BtcApiHelper
   const testnet = 'testnet', mainnet = 'mainnet'
 
   before(async () => {
@@ -33,16 +33,16 @@ describe('BtcApiHelper', () => {
   //   }
   // })
 
-  // it('getBalance', async () => {
-  //   try {
-  //     const result = await helper.getBalance('2NBV483qX29Zd7yCPUUmUCCXpLnu51EExwP')
-  //     global.logger.error('2', result)
-  //     // assert.notStrictEqual(result, undefined)
-  //   } catch (err) {
-  //     global.logger.error(err)
-  //     assert.throws(() => {}, err)
-  //   }
-  // })
+  it('getBalance', async () => {
+    try {
+      const result = await helper.getBalance('2NBV483qX29Zd7yCPUUmUCCXpLnu51EExwP')
+      global.logger.error('2', result)
+      // assert.notStrictEqual(result, undefined)
+    } catch (err) {
+      global.logger.error(err)
+      assert.throws(() => {}, err)
+    }
+  })
 
   // it('getChainInfo', async () => {
   //   try {
