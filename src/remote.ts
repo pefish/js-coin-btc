@@ -32,7 +32,7 @@ export default class Remote {
     let networkFee: string
     let feerate = (await this.client.estimateSmartFee(20)).feerate.toString();
     if (feerate.lt_(0)) {
-      throw new ErrorHelper(`estimateSmartFee access error`)
+      throw new ErrorHelper(`estimateSmartFee no result`)
     }
     const proposeNetworkFee = feerate.multi_(txSize).div_(1000).multi_(1.2)
     if (!feerate) {
