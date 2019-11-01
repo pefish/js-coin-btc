@@ -23,12 +23,17 @@
   resolved "https://registry.yarnpkg.com/@pefish/js-error/-/js-error-0.1.1.tgz#d3e6f4a1362206aaf73afd628465364c3a581ed2"
   integrity sha512-JNLY0twr0fVEnGgrMetZsBZrStDGmHDX0dY9amDChTzVqrGEd6dvpzkR9BxINGhWgeAX6naTzI2FZn3ZwGlrsw==
 
-"@pefish/js-node-assist@^0.6.9":
-  version "0.6.9"
-  resolved "https://registry.yarnpkg.com/@pefish/js-node-assist/-/js-node-assist-0.6.9.tgz#60d50c0f82469441d4cd22b51f2645585170f414"
-  integrity sha512-acqJwvoBDVem8hqxJ7ctdPoRuuyPLXEFjPeIzQy12x+zs4ktlYqQx0p+cH61pILRM4Z0RDDeK6MZYRSUDp6lAA==
+"@pefish/js-error@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@pefish/js-error/-/js-error-0.1.2.tgz#89913c01f960318fa5108e79d99c27ad90b4430f"
+  integrity sha512-JFM3pW2MhGwOwdaSfUw79DsE52oh27meYzL07B/gkX7+oF0ByVs1/BuEFMBaTk5RMnMijN0lCEuCpfZgcShO3A==
+
+"@pefish/js-node-assist@^0.6.11":
+  version "0.6.11"
+  resolved "https://registry.yarnpkg.com/@pefish/js-node-assist/-/js-node-assist-0.6.11.tgz#b518afc950f145cea7c87262520baf48aa95ea85"
+  integrity sha512-osPSF2A4cBiSH5rPOSymnueRiOrHL4hmGidaUhmGByvbaKopKT/XZdRf2bZDoS74oLyloXCfroD/3fJLmVESWA==
   dependencies:
-    "@pefish/js-error" "^0.1.1"
+    "@pefish/js-error" "^0.1.2"
     bignumber.js "^8.1.1"
 
 "@pefish/js-util-desensitize@^0.0.3":

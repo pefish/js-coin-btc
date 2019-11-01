@@ -1,6 +1,6 @@
 {
   "name": "@pefish/js-coin-btc",
-  "version": "0.3.11",
+  "version": "0.3.12",
   "description": "btc tool of js",
   "keywords": [
     "common",
@@ -35,8 +35,8 @@
     "typescript": "^3.4.5"
   },
   "dependencies": {
-    "@pefish/js-error": "^0.1.1",
-    "@pefish/js-node-assist": "^0.6.9",
+    "@pefish/js-error": "^0.1.2",
+    "@pefish/js-node-assist": "^0.6.11",
     "@pefish/js-util-httprequest": "^0.0.11",
     "bigi": "^1.4.2",
     "bip32": "^2.0.4",
