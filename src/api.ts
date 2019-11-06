@@ -16,8 +16,10 @@ export default class BtcApiHelper {
   }
 
   async sendRawTransaction (txHex: string) {
-    const result = await HttpRequestUtil.postJson(this.buildFullUrl('/txs/push'), null, {
-      tx: txHex
+    const result = await HttpRequestUtil.post(this.buildFullUrl('/txs/push'), {
+      params: {
+        tx: txHex
+      },
     })
     if (result['error']) {
       throw new ErrorHelper(result['error']['message'])
@@ -25,7 +27,7 @@ export default class BtcApiHelper {
   }
 
   async getAddressInfo (address: string): Promise<any> {
-    const result = await HttpRequestUtil.getJson(this.buildFullUrl(`/addrs/${address}`))
+    const result = await HttpRequestUtil.get(this.buildFullUrl(`/addrs/${address}`))
     if (result['error']) {
       throw new ErrorHelper(result['error']['message'])
     }
@@ -33,7 +35,7 @@ export default class BtcApiHelper {
   }
 
   async getBalance (address: string, zeroConfirmation: boolean = true): Promise<string> {
-    const result = await HttpRequestUtil.getJson(this.buildFullUrl(`/addrs/${address}/balance`))
+    const result = await HttpRequestUtil.get(this.buildFullUrl(`/addrs/${address}/balance`))
     if (result['error']) {
       throw new ErrorHelper(result['error']['message'])
     }
@@ -41,7 +43,7 @@ export default class BtcApiHelper {
   }
 
   async getUnconfirmedTxs (): Promise<any[]> {
-    const result = await HttpRequestUtil.getJson(this.buildFullUrl(`/txs`))
+    const result = await HttpRequestUtil.get(this.buildFullUrl(`/txs`))
     if (result['error']) {
       throw new ErrorHelper(result['error']['message'])
     }
@@ -49,7 +51,7 @@ export default class BtcApiHelper {
   }
 
   async getChainInfo (): Promise<any> {
-    const result = await HttpRequestUtil.getJson(this.buildFullUrl(''))
+    const result = await HttpRequestUtil.get(this.buildFullUrl(''))
     if (result['error']) {
       throw new ErrorHelper(result['error']['message'])
     }
