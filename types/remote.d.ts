@@ -12,7 +12,7 @@ export default class Remote {
     constructor(rpcConfig: RemoteConfig);
     request(method: string, params: any[]): Promise<any>;
     /**
-     * 评估交易手续费
+     * 评估交易手续费(单位BTC)
      * @param txSize raw transaction的字节数，长度除以2
      * @param upNetworkFee 上限
      * @param downNetworkFee 下限
