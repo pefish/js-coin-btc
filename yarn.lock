@@ -36,10 +36,10 @@
   resolved "https://registry.yarnpkg.com/@pefish/js-util-desensitize/-/js-util-desensitize-0.1.0.tgz#8cec31858ee9b450512a7053dbbd1cca7c9933fd"
   integrity sha512-+rGrebTjtrpWoZmXU+969kYtsBWOw2r5M5YLp3nixfgpjC8z9LYhBPlSejaBSIsSLfXLWjRx0Dvnmgap/VXz3A==
 
-"@pefish/js-util-httprequest@^0.1.0":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@pefish/js-util-httprequest/-/js-util-httprequest-0.1.1.tgz#7f78b4df0c3105f9ba228e167f20469c5fff22fa"
-  integrity sha512-ULjiibShiawit5EOhiMJU4ejrPiirMu04QEPZnH+OQSr49RuP9aQsyG0zllEuN8T2kz1ZOIYV6PQMIVzU4ocKw==
+"@pefish/js-util-httprequest@^0.1.3":
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/@pefish/js-util-httprequest/-/js-util-httprequest-0.1.3.tgz#7cdb27b16fc64d5ef2f25daa28e86d80308a8e79"
+  integrity sha512-XszBkeMiCc7Jfhxu6srzYtWrqKDNF8u9qjpsPoMNQMXSH1golP+FpJnP1Q56pQmRKXinifeD1Fq7UOiVMAzoiA==
   dependencies:
     "@pefish/js-util-desensitize" "^0.1.0"
     request "^2.88.0"
