@@ -124,10 +124,13 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
      * @returns {*|boolean}
      */
     verifyAddressType(address: string, type?: string, network?: string): boolean;
-    getAddressFromPublicKey(publicKey: string | {
+    getAddressInfoFromPublicKey(publicKey: string | {
         pubkeys: string[];
         m: number;
-    }, type?: string, network?: string): string;
+    }, type?: string, network?: string): {
+        address: string;
+        redeemScript: string;
+    };
     /**
      * 由30位mint字符串得到ecpair
      * @param mintStr

@@ -320,57 +320,84 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
     return false
   }
 
-  getAddressFromPublicKey(publicKey: string | { pubkeys: string[], m: number}, type: string = 'p2pkh', network: string = 'testnet'): string {
+  getAddressInfoFromPublicKey(publicKey: string | { pubkeys: string[], m: number}, type: string = 'p2pkh', network: string = 'testnet'): {
+    address: string,
+    redeemScript: string,
+  } {
     const realNetwork = this.parseNetwork(network)
     if (type === 'p2pkh') {
       // 常规地址
-      return this.bitcoinLib.payments.p2pkh({
+      const p2pkh = this.bitcoinLib.payments.p2pkh({
         pubkey: (publicKey as string).hexToBuffer_(),
         network: realNetwork
-      })[`address`]
+      })
+      return {
+        address: p2pkh.address,
+        redeemScript: p2pkh.redeem ? p2pkh.redeem.output.toString('hex') : "",
+      }
     } else if (type === 'p2wpkh') {
       // bitcoind的bech32参数
-      return this.bitcoinLib.payments.p2wpkh({
+      const p2wpkh = this.bitcoinLib.payments.p2wpkh({
         pubkey: (publicKey as string).hexToBuffer_(),
         network: realNetwork
-      })[`address`]
+      })
+      return {
+        address: p2wpkh.address,
+        redeemScript: p2wpkh.redeem ? p2wpkh.redeem.output.toString('hex') : "",
+      }
     } else if (type === 'p2sh(p2wpkh)') {
       // 这就是segwit地址，bitcoind的p2sh-segwit参数(p2sh-segwit)
-      return this.bitcoinLib.payments.p2sh({
+      const p2sh = this.bitcoinLib.payments.p2sh({
         redeem: this.bitcoinLib.payments.p2wpkh({ pubkey: (publicKey as string).hexToBuffer_(), network: realNetwork }),
         network: realNetwork
-      })[`address`]
+      })
+      return {
+        address: p2sh.address,
+        redeemScript: p2sh.redeem ? p2sh.redeem.output.toString('hex') : "",
+      }
     } else if (type === 'p2wsh(p2ms)') {
       const {pubkeys, m} = publicKey as { pubkeys: string[], m: number}
       const pubKeysBuffer = pubkeys.map((hex) => {
         return Buffer.from(hex, 'hex')
       })
-      return this.bitcoinLib.payments.p2wsh({
+      const p2wsh = this.bitcoinLib.payments.p2wsh({
         redeem: this.bitcoinLib.payments.p2ms({ m, pubkeys: pubKeysBuffer, network: realNetwork }),
         network: realNetwork
-      })[`address`]
+      })
+      return {
+        address: p2wsh.address,
+        redeemScript: p2wsh.redeem ? p2wsh.redeem.output.toString('hex') : "",
+      }
     } else if (type === 'p2sh(p2wsh(p2ms))') {
       const {pubkeys, m} = publicKey as { pubkeys: string[], m: number}
       const pubKeysBuffer = pubkeys.map((hex) => {
         return Buffer.from(hex, 'hex')
       })
-      return this.bitcoinLib.payments.p2sh({
+      const p2sh = this.bitcoinLib.payments.p2sh({
         redeem: this.bitcoinLib.payments.p2wsh({
           redeem: this.bitcoinLib.payments.p2ms({ m, pubkeys: pubKeysBuffer, network: realNetwork }),
           network: realNetwork
         }),
         network: realNetwork
-      })[`address`]
+      })
+      return {
+        address: p2sh.address,
+        redeemScript: p2sh.redeem ? p2sh.redeem.output.toString('hex') : "",
+      }
     } else if (type === 'p2sh(p2ms)') {
       // 网上一般用这个
       const {pubkeys, m} = publicKey as { pubkeys: string[], m: number}
       const pubKeysBuffer = pubkeys.map((hex) => {  // pubkeys顺序不一样，生成的地址也不一样，签名时pubkeys的顺序也必须是这样，参与者的签名顺序无关
         return Buffer.from(hex, 'hex')
       })
-      return this.bitcoinLib.payments.p2sh({
+      const p2sh = this.bitcoinLib.payments.p2sh({
         redeem: this.bitcoinLib.payments.p2ms({ m, pubkeys: pubKeysBuffer, network: realNetwork }),
         network: realNetwork
-      })[`address`]
+      })
+      return {
+        address: p2sh.address,
+        redeemScript: p2sh.redeem ? p2sh.redeem.output.toString('hex') : "",
+      }
     } else {
       throw new ErrorHelper('type指定错误')
     }

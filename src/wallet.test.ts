@@ -198,15 +198,18 @@ describe('bitcoinWalletHelper', () => {
     }
   })
 
-  it('getAddressFromPublicKey', async () => {
+  it('getAddressInfoFromPublicKey', async () => {
     try {
-      const p2pkh = walletHelper.getAddressFromPublicKey('02f7166a1fd8dd1b253667c63af6e580d9867abe79e48d4df655c98b71fd81a8e8', `p2pkh`, mainnet)
-      assert.strictEqual(p2pkh, `18cN2hvpn4KHKKuGQMz7wQBDKKumRhN7Z3`)
-      const p2wpkh = walletHelper.getAddressFromPublicKey('02f7166a1fd8dd1b253667c63af6e580d9867abe79e48d4df655c98b71fd81a8e8', `p2wpkh`, mainnet)
-      assert.strictEqual(p2wpkh, `bc1q2du0uhvgwmj9e7gn9en080j986gtvsa6tl8zc4`)
-      const segwit = walletHelper.getAddressFromPublicKey('02f7166a1fd8dd1b253667c63af6e580d9867abe79e48d4df655c98b71fd81a8e8', `p2sh(p2wpkh)`, mainnet)
+      const p2pkh = walletHelper.getAddressInfoFromPublicKey('02f7166a1fd8dd1b253667c63af6e580d9867abe79e48d4df655c98b71fd81a8e8', `p2pkh`, mainnet)
+      assert.strictEqual(p2pkh.address, `18cN2hvpn4KHKKuGQMz7wQBDKKumRhN7Z3`)
+      assert.strictEqual(p2pkh.redeemScript, ``)
+      const p2wpkh = walletHelper.getAddressInfoFromPublicKey('02f7166a1fd8dd1b253667c63af6e580d9867abe79e48d4df655c98b71fd81a8e8', `p2wpkh`, mainnet)
+      assert.strictEqual(p2wpkh.address, `bc1q2du0uhvgwmj9e7gn9en080j986gtvsa6tl8zc4`)
+      assert.strictEqual(p2wpkh.redeemScript, ``)
+      const segwit = walletHelper.getAddressInfoFromPublicKey('02f7166a1fd8dd1b253667c63af6e580d9867abe79e48d4df655c98b71fd81a8e8', `p2sh(p2wpkh)`, mainnet)
       // logger.error(segwit)
-      assert.strictEqual(segwit, `36v5uJ54F4VwJU2qzf3t2FQdHgL7d38HUg`)
+      assert.strictEqual(segwit.address, `36v5uJ54F4VwJU2qzf3t2FQdHgL7d38HUg`)
+      assert.strictEqual(segwit.redeemScript, `00145378fe5d8876e45cf9132e66f3be453e90b643ba`)
     } catch (err) {
       global.logger.error(err)
       assert.throws(() => {}, err)
@@ -216,24 +219,24 @@ describe('bitcoinWalletHelper', () => {
   it('getAddressFromWif', async () => {
     try {
       const result = walletHelper.getAllFromWif('KwyadqQkPHVkQsreCS2dVrHBQE79TNiDHPjrP9aTL8Zc9BWrf4U6', mainnet)
-      const p2pkh = walletHelper.getAddressFromPublicKey(result[`publicKey`], `p2pkh`, mainnet)
+      const p2pkh = walletHelper.getAddressInfoFromPublicKey(result[`publicKey`], `p2pkh`, mainnet)
       // global.logger.error(p2pkh)
-      assert.strictEqual(p2pkh, `1LKz7cLQVSTzPdg8yP1pbKU1hiYSXtvnWK`)
-      const p2wpkh = walletHelper.getAddressFromPublicKey(result[`publicKey`], `p2wpkh`, mainnet)
+      assert.strictEqual(p2pkh.address, `1LKz7cLQVSTzPdg8yP1pbKU1hiYSXtvnWK`)
+      const p2wpkh = walletHelper.getAddressInfoFromPublicKey(result[`publicKey`], `p2wpkh`, mainnet)
       // global.logger.error(p2wpkh)
-      assert.strictEqual(p2wpkh, `bc1q6sqcmdp8ql5c6wkapqyhppqkk36gdhxsdu2ek6`)
-      const segwit = walletHelper.getAddressFromPublicKey(result[`publicKey`], `p2sh(p2wpkh)`, mainnet)
+      assert.strictEqual(p2wpkh.address, `bc1q6sqcmdp8ql5c6wkapqyhppqkk36gdhxsdu2ek6`)
+      const segwit = walletHelper.getAddressInfoFromPublicKey(result[`publicKey`], `p2sh(p2wpkh)`, mainnet)
       // global.logger.error(segwit)
-      assert.strictEqual(segwit, `3MJZpHDFq6kBuPYvePvw1F7tDefwexuFSF`)
+      assert.strictEqual(segwit.address, `3MJZpHDFq6kBuPYvePvw1F7tDefwexuFSF`)
     } catch (err) {
       global.logger.error(err)
       assert.throws(() => {}, err)
     }
   })
 
-  it('getAddressFromPublicKey p2wsh(p2ms)', async () => {
+  it('getAddressInfoFromPublicKey p2wsh(p2ms)', async () => {
     try {
-      const result1 = walletHelper.getAddressFromPublicKey({
+      const result1 = walletHelper.getAddressInfoFromPublicKey({
         pubkeys: [
           '03b48aaed5afd55af800bf3d7fb9d0b62507548237b10820aaae8b3af192ff33a1',
           '031b022777c4e4ddf7cdbb216c51c9666b4f59636cc11f2ad15022ef5e0f0ca397',
@@ -243,16 +246,16 @@ describe('bitcoinWalletHelper', () => {
         m: 2
       }, `p2wsh(p2ms)`, mainnet)
       // logger.error(result1)
-      assert.strictEqual(result1, `bc1q7wewmjmhdm8axyf3s8vyqlr9fqqtpzpfa9m56ttksywxzw0w34vsnhsz57`)
+      assert.strictEqual(result1.address, `bc1q7wewmjmhdm8axyf3s8vyqlr9fqqtpzpfa9m56ttksywxzw0w34vsnhsz57`)
     } catch (err) {
       global.logger.error(err)
       assert.throws(() => {}, err)
     }
   })
 
-  it('getAddressFromPublicKey p2sh(p2wsh(p2ms))', async () => {
+  it('getAddressInfoFromPublicKey p2sh(p2wsh(p2ms))', async () => {
     try {
-      const result1 = walletHelper.getAddressFromPublicKey({
+      const result1 = walletHelper.getAddressInfoFromPublicKey({
         pubkeys: [
           '03b48aaed5afd55af800bf3d7fb9d0b62507548237b10820aaae8b3af192ff33a1',
           '031b022777c4e4ddf7cdbb216c51c9666b4f59636cc11f2ad15022ef5e0f0ca397',
@@ -262,16 +265,16 @@ describe('bitcoinWalletHelper', () => {
         m: 2
       }, `p2sh(p2wsh(p2ms))`, mainnet)
       // logger.error(result1)
-      assert.strictEqual(result1, `33ftreLmAd5UfUo36xogBUW29qPN11dWq4`)
+      assert.strictEqual(result1.address, `33ftreLmAd5UfUo36xogBUW29qPN11dWq4`)
     } catch (err) {
       global.logger.error(err)
       assert.throws(() => {}, err)
     }
   })
 
-  it('getAddressFromPublicKey p2sh(p2ms)', async () => {
+  it('getAddressInfoFromPublicKey p2sh(p2ms)', async () => {
     try {
-      const result1 = walletHelper.getAddressFromPublicKey({
+      const result1 = walletHelper.getAddressInfoFromPublicKey({
         pubkeys: [
           '03b48aaed5afd55af800bf3d7fb9d0b62507548237b10820aaae8b3af192ff33a1',
           '031b022777c4e4ddf7cdbb216c51c9666b4f59636cc11f2ad15022ef5e0f0ca397',
@@ -281,7 +284,7 @@ describe('bitcoinWalletHelper', () => {
         m: 2
       }, `p2sh(p2ms)`, mainnet)
       // logger.error(result1)
-      assert.strictEqual(result1, `3AgHM7WNCqxc5AUr1g69uK4ikKCgrqb5cZ`)
+      assert.strictEqual(result1.address, `3AgHM7WNCqxc5AUr1g69uK4ikKCgrqb5cZ`)
     } catch (err) {
       global.logger.error(err)
       assert.throws(() => {}, err)
