@@ -1,4 +1,3 @@
-import '@pefish/js-node-assist';
 import Client from 'bitcoin-core';
 export interface RemoteConfig {
     host: string;

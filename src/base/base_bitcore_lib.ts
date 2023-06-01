@@ -1,4 +1,5 @@
 import BaseCoin from './base_coin'
+import {StringUtil} from "@pefish/js-node-assist";
 
 export default abstract class BaseBitcoreLib extends BaseCoin {
   public abstract decimals: number
@@ -60,7 +61,7 @@ export default abstract class BaseBitcoreLib extends BaseCoin {
       privateKeys.push(this.bitcoinLib.PrivateKey.fromWIF(wif))
       index = (index === undefined ? utxo['vout'] : index)
       satoshis = (satoshis === undefined ? utxo['amount'].shiftedBy_(this.decimals) : satoshis)
-      totalUtxoBalance = totalUtxoBalance.add_(satoshis)
+      totalUtxoBalance = StringUtil.start(totalUtxoBalance).add(satoshis).toString()
       newUtxos.push({
         txid: txid,
         outputIndex: index,
@@ -75,7 +76,7 @@ export default abstract class BaseBitcoreLib extends BaseCoin {
         address: target.address,
         satoshis: target.amount.toNumber_()
       })
-      targetTotalAmount = targetTotalAmount.add_(target.amount)
+      targetTotalAmount = StringUtil.start(targetTotalAmount).add(target.amount).toString()
     }
     if (fee.lt_(1000)) {
       fee = '1000'

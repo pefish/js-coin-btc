@@ -2,11 +2,12 @@ import BaseCoin from './base_coin'
 import ErrorHelper from '@pefish/js-error'
 import BigInteger from 'bigi'
 import crypto from 'crypto'
+import * as ecc from 'tiny-secp256k1';
 import { BIP32Interface, fromBase58, fromSeed } from 'bip32'
 import b58 from 'bs58check'
-import { Network, Transaction, TransactionBuilder } from 'bitcoinjs-lib';
-import { ECPairInterface } from 'bitcoinjs-lib/types/ecpair';
+import { Network, Transaction, Psbt } from 'bitcoinjs-lib';
 import { validateMnemonic, mnemonicToSeedSync, generateMnemonic } from 'bip39'
+import {BufferUtil, NumberUtil, StringUtil} from "@pefish/js-node-assist";
 
 export interface Utxo { txid?: string, wif: string | string[], index?: number, balance: string, sequence?: number, type?: string, pubkeys?: string[], m?: number}
 
@@ -41,7 +42,7 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
 
   getSeedByMnemonic (mnemonic: string, pass: string = ''): string {
     const seed = mnemonicToSeedSync(mnemonic, pass)
-    return seed.toHexString_(false)
+    return BufferUtil.toHexString(seed, false)
   }
 
   /**
@@ -65,12 +66,12 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
 
     const node = fromSeed(seed, realNetwork)
     return {
-      seed: seed.toHexString_(false),
+      seed: BufferUtil.toHexString(seed, false),
       xpriv: node.toBase58(),  // 主私钥, depth为0(BIP32 Root Key)
       xpub: node.neutered().toBase58(),  // 主公钥, neutered是去掉私钥价值
-      chainCode: node.chainCode.toHexString_(false),
-      privateKey: node.privateKey.toHexString_(false),
-      publicKey: node.publicKey.toHexString_(false),
+      chainCode: BufferUtil.toHexString(node.chainCode, false),
+      privateKey: BufferUtil.toHexString(node.privateKey, false),
+      publicKey: BufferUtil.toHexString(node.publicKey, false),
       wif: node.toWIF()
     }
   }
@@ -84,13 +85,13 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
     wif: string
   } {
     const realNetwork = this.parseNetwork(network)
-    const node = fromSeed(seed.hexToBuffer_(), realNetwork)
+    const node = fromSeed(StringUtil.hexToBuffer(seed), realNetwork)
     return {
       xpriv: node.toBase58(),  // 主私钥, depth为0(BIP32 Root Key)
       xpub: node.neutered().toBase58(),  // 主公钥, neutered是去掉私钥价值
-      chainCode: node.chainCode.toHexString_(false),
-      privateKey: node.privateKey.toHexString_(false),
-      publicKey: node.publicKey.toHexString_(false),
+      chainCode: BufferUtil.toHexString(node.chainCode, false),
+      privateKey: BufferUtil.toHexString(node.privateKey, false),
+      publicKey: BufferUtil.toHexString(node.publicKey, false),
       wif: node.toWIF()
     }
   }
@@ -116,7 +117,7 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
     }
     let data = b58.decode(sourcePub)
     data = data.slice(4)
-    data = Buffer.concat([prefix.hexToBuffer_(), data])
+    data = Buffer.concat([StringUtil.hexToBuffer(prefix), data])
     return b58.encode(data)
   }
 
@@ -139,7 +140,7 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
     }
     let data = b58.decode(sourcePrv)
     data = data.slice(4)
-    data = Buffer.concat([prefix.hexToBuffer_(), data])
+    data = Buffer.concat([StringUtil.hexToBuffer(prefix), data])
     return b58.encode(data)
   }
 
@@ -178,8 +179,8 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
   getAllFromXpub(xpub: string, network: string = 'testnet'): { chainCode: string, publicKey: string } {
     const node = this.getNodeFromXpub(xpub, network)
     return {
-      chainCode: node.chainCode.toHexString_(false),
-      publicKey: node.publicKey.toHexString_(false)
+      chainCode: BufferUtil.toHexString(node.chainCode, false),
+      publicKey: BufferUtil.toHexString(node.publicKey, false)
     }
   }
 
@@ -198,7 +199,7 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
       privateKey = privateKey.substring(2, privateKey.length)
     }
 
-    const ecPair = this.bitcoinLib.ECPair.fromPrivateKey(privateKey.hexToBuffer_(), {
+    const ecPair = this.bitcoinLib.ECPair.fromPrivateKey(StringUtil.hexToBuffer(privateKey), {
       network: realNetwork,
       compressed,
     })
@@ -219,9 +220,9 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
     return {
       xpub: node.neutered().toBase58(),
       wif: node.toWIF(),
-      privateKey: node.privateKey.toHexString_(false),
-      publicKey: node.publicKey.toHexString_(false),
-      chainCode: node.chainCode.toHexString_(false),
+      privateKey: BufferUtil.toHexString(node.privateKey, false),
+      publicKey: BufferUtil.toHexString(node.publicKey, false),
+      chainCode: BufferUtil.toHexString(node.chainCode, false),
     }
   }
 
@@ -328,7 +329,7 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
     if (type === 'p2pkh') {
       // 常规地址
       const p2pkh = this.bitcoinLib.payments.p2pkh({
-        pubkey: (publicKey as string).hexToBuffer_(),
+        pubkey: StringUtil.hexToBuffer((publicKey as string)),
         network: realNetwork
       })
       return {
@@ -338,7 +339,7 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
     } else if (type === 'p2wpkh') {
       // bitcoind的bech32参数
       const p2wpkh = this.bitcoinLib.payments.p2wpkh({
-        pubkey: (publicKey as string).hexToBuffer_(),
+        pubkey: StringUtil.hexToBuffer((publicKey as string)),
         network: realNetwork
       })
       return {
@@ -348,12 +349,21 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
     } else if (type === 'p2sh(p2wpkh)') {
       // 这就是segwit地址，bitcoind的p2sh-segwit参数(p2sh-segwit)
       const p2sh = this.bitcoinLib.payments.p2sh({
-        redeem: this.bitcoinLib.payments.p2wpkh({ pubkey: (publicKey as string).hexToBuffer_(), network: realNetwork }),
+        redeem: this.bitcoinLib.payments.p2wpkh({ pubkey: StringUtil.hexToBuffer((publicKey as string)), network: realNetwork }),
         network: realNetwork
       })
       return {
         address: p2sh.address,
         redeemScript: p2sh.redeem ? p2sh.redeem.output.toString('hex') : "",
+      }
+    } else if (type == 'p2tr') {
+      this.bitcoinLib.initEccLib(ecc);
+      const { address, output } = this.bitcoinLib.payments.p2tr({
+        internalPubkey: StringUtil.hexToBuffer((publicKey as string)).slice(1, 33),
+      })
+      return {
+        address: address,
+        redeemScript: output.toString('hex'),
       }
     } else if (type === 'p2wsh(p2ms)') {
       const {pubkeys, m} = publicKey as { pubkeys: string[], m: number}
@@ -409,10 +419,10 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
    * @param compress 是否进行压缩
    * @param network
    */
-  getKeyPairFromMint(mintStr: string, compress: boolean = true, network: string = 'testnet'): ECPairInterface {
+  getKeyPairFromMint(mintStr: string, compress: boolean = true, network: string = 'testnet'): any {
     const realNetwork = this.parseNetwork(network)
     const afterSha256 = crypto.createHash('sha256').update(mintStr).digest('hex')
-    return new this.bitcoinLib.ECPair(BigInteger.fromBuffer(afterSha256.hexToBuffer_()), null, {
+    return new this.bitcoinLib.ECPair(BigInteger.fromBuffer(StringUtil.hexToBuffer(afterSha256)), null, {
       compressed: compress,
       network: realNetwork
     })
@@ -443,9 +453,9 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
       xpriv: currentNode.toBase58(), // BIP32 Extended Private Key
       xpub: currentNode.neutered().toBase58(), // BIP32 Extended Public Key
       wif: currentNode.toWIF(),
-      chainCode: currentNode.chainCode.toHexString_(false),
-      privateKey: currentNode.privateKey.toHexString_(false),
-      publicKey: currentNode.publicKey.toHexString_(false)
+      chainCode: BufferUtil.toHexString(currentNode.chainCode, false),
+      privateKey: BufferUtil.toHexString(currentNode.privateKey, false),
+      publicKey: BufferUtil.toHexString(currentNode.publicKey, false)
     }
   }
 
@@ -463,8 +473,8 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
     const node = this.getNodeFromXpub(xpub, network)
     const currentNode = node.derivePath(path).neutered()
     return {
-      chainCode: currentNode.chainCode.toHexString_(false),
-      publicKey: currentNode.publicKey.toHexString_(false)
+      chainCode: BufferUtil.toHexString(currentNode.chainCode, false),
+      publicKey: BufferUtil.toHexString(currentNode.publicKey, false)
     }
   }
 
@@ -494,7 +504,7 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
     version: number = 2
   ): { txHex: string, txId: string, fee: string, inputAmount: string, outputAmount: string, changeAmount: string} {
     const realNetwork = this.parseNetwork(network)
-    const txBuilder = new this.bitcoinLib.TransactionBuilder(realNetwork, 3000)
+    const txBuilder = new this.bitcoinLib.Psbt(realNetwork, 3000)
     txBuilder.setVersion(version)
     let totalUtxoBalance = '0'
 
@@ -502,7 +512,7 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
       throw new ErrorHelper(`没有输入`)
     }
 
-    if (fee.gt_(`10000000`)) {
+    if (StringUtil.start(fee).gt(`10000000`)) {
       throw new ErrorHelper(`手续费过高，请检查`)
     }
 
@@ -513,14 +523,14 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
       } else {
         txBuilder.addInput(txid, index)
       }
-      totalUtxoBalance = totalUtxoBalance.add_(balance)
+      totalUtxoBalance = StringUtil.start(totalUtxoBalance).add(balance).toString()
     }
 
     let targetTotalAmount = '0'
     // 计算要发送出去的总额
     targets.forEach((target) => {
       const {amount} = target
-      targetTotalAmount = targetTotalAmount.add_(amount.toString())
+      targetTotalAmount = StringUtil.start(targetTotalAmount).add(amount.toString()).toString()
     })
 
     // 添加其他输出
@@ -532,22 +542,22 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
         outputScript = this.bitcoinLib.script.nullData.output.encode(Buffer.from(msg, 'utf8'))
       }
       try {
-        txBuilder.addOutput(outputScript, amount.toNumber_())
+        txBuilder.addOutput(outputScript, StringUtil.start(amount).toNumber())
       } catch (err) {
         throw new ErrorHelper('构造output出错' + err['message'], 0, JSON.stringify(target), err)
       }
     }
-    if (fee.lt_(1000)) {
+    if (StringUtil.start(fee).lt(1000)) {
       fee = '1000'
     }
     // 添加找零的输出
-    const changeAmount = totalUtxoBalance.sub_(targetTotalAmount).sub_(fee.toString())
-    if (changeAmount.lt_(0)) {
+    const changeAmount = StringUtil.start(totalUtxoBalance).sub(targetTotalAmount).sub(fee.toString()).toString()
+    if (StringUtil.start(changeAmount).lt(0)) {
       throw new ErrorHelper(`balance not enough`)
     }
     if (changeAmount !== '0') {
-      const amount = totalUtxoBalance.sub_(targetTotalAmount).sub_(fee.toString())
-      txBuilder.addOutput(changeAddress, amount.toNumber_())
+      const amount = StringUtil.start(totalUtxoBalance).sub(targetTotalAmount).sub(fee.toString()).toString()
+      txBuilder.addOutput(changeAddress, StringUtil.start(amount).toNumber())
     }
     let buildedTx = null
     if (sign) {
@@ -603,7 +613,7 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
       }
 
       outputs.push(tempOutput)
-      outputAmount = outputAmount.add_(value)
+      outputAmount = StringUtil.start(outputAmount).add(value).toString()
     }
     return {
       txHex: tx.toHex(),
@@ -670,20 +680,20 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
     outputAmount: string;
   } {
     const realNetwork = this.parseNetwork(network)
-    const txBuilder = this.bitcoinLib.TransactionBuilder.fromTransaction(this.bitcoinLib.Transaction.fromHex(txHex), realNetwork)
+    const txBuilder = this.bitcoinLib.Psbt.fromTransaction(this.bitcoinLib.Transaction.fromHex(txHex), realNetwork)
     const buildedTx = this._signUtxos(txBuilder, utxos, realNetwork)
     const inputs = [], outputs = []
     let outputAmount = '0'
     for (const input of buildedTx.ins) {
       inputs.push({
-        hash: input['hash'].reverseBuffer_().toHexString_(false),
+        hash: BufferUtil.toHexString(BufferUtil.reverseBuffer(input['hash']), false),
         index: input['index'],
         sequence: input['sequence']
       })
     }
     for (let i = 0; i < buildedTx.outs.length; i++) {
       const output = buildedTx.outs[i]
-      const value = output['value'].toString().unShiftedBy_(this.decimals)
+      const value = StringUtil.start(output['value']).unShiftedBy(this.decimals).toString()
       const tempOutput = {
         value,
         index: i
@@ -691,11 +701,11 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
       try {
         tempOutput['address'] = this.outputScriptToAddress(output['script'], network)
       } catch (err) {
-        tempOutput['script'] = output['script'].toHexString_(false)
+        tempOutput['script'] = BufferUtil.toHexString(output['script'], false)
       }
 
       outputs.push(tempOutput)
-      outputAmount = outputAmount.add_(value)
+      outputAmount = StringUtil.start(outputAmount).add(value).toString()
     }
     return {
       txHex: buildedTx.toHex(),
@@ -714,20 +724,20 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
    * @returns {*|Transaction}
    * @private
    */
-  _signUtxos(txBuilder: TransactionBuilder, utxos: Utxo[], network: Network): Transaction {
+  _signUtxos(txBuilder: Psbt, utxos: Utxo[], network: Network): Transaction {
     // logger.error(arguments)
     utxos.map((utxo, index) => {
       const {wif, type = 'p2wpkh', balance, pubkeys, m} = utxo
       if (type === 'p2wpkh') {
         const keyPair = this.bitcoinLib.ECPair.fromWIF(wif, network)
-        txBuilder.sign(index, keyPair)
+        txBuilder.signInput(index, keyPair)
       } else if (type === 'p2sh(p2wpkh)') {
         const keyPair = this.bitcoinLib.ECPair.fromWIF(wif, network)
         const redeemScriptBuffer = this.bitcoinLib.payments.p2sh({
           redeem: this.bitcoinLib.payments.p2wpkh({ pubkey: keyPair.publicKey, network }),
           network
         })[`redeem`][`output`]
-        txBuilder.sign(index, keyPair, redeemScriptBuffer, null, balance.toNumber_())
+        txBuilder.signInput(index, keyPair, redeemScriptBuffer)
       } else if (type === 'p2wsh(p2ms)') {
         const keyPairs = (wif as string[]).map((wif_) => {
           return this.bitcoinLib.ECPair.fromWIF(wif_, network)
@@ -740,7 +750,7 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
           network
         })
         for (const keyPair of keyPairs) {
-          txBuilder.sign(index, keyPair, p2sh.redeem.output)
+          txBuilder.signInput(index, keyPair, p2sh.redeem.output)
         }
       } else if (type === 'p2sh(p2ms)') {
         const keyPairs = (wif as string[]).map((wif_) => {
@@ -754,27 +764,12 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
           network
         })
         for (const keyPair of keyPairs) {
-          txBuilder.sign(index, keyPair, p2sh.redeem.output)
-        }
-      } else if (type === 'p2sh(p2wsh(p2ms))') {
-        const keyPairs = (wif as string[]).map((wif_) => {
-          return this.bitcoinLib.ECPair.fromWIF(wif_, network)
-        })
-        const pubKeysBuffer = pubkeys.map((pubkey) => {
-          return Buffer.from(pubkey, 'hex')
-        })
-        const p2wsh = this.bitcoinLib.payments.p2wsh({
-          redeem: this.bitcoinLib.payments.p2ms({ m: m || keyPairs.length, pubkeys: pubKeysBuffer, network }),
-          network
-        })
-        const p2sh = this.bitcoinLib.payments.p2sh({ redeem: p2wsh, network })
-        for (const keyPair of keyPairs) {
-          txBuilder.sign(index, keyPair, p2sh.redeem.output, null, balance.toNumber_(), p2wsh.redeem.output)
+          txBuilder.signInput(index, keyPair, p2sh.redeem.output)
         }
       } else {
         throw new ErrorHelper('utxo中type指定错误')
       }
     })
-    return txBuilder.build()
+    return txBuilder.extractTransaction()
   }
 }

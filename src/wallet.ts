@@ -1,5 +1,4 @@
 /** @module */
-import '@pefish/js-node-assist'
 import BaseBitcoinjsLib from './base/base_bitcoinjs_lib'
 import ErrorHelper from '@pefish/js-error'
 import Remote, { RemoteConfig } from './remote'

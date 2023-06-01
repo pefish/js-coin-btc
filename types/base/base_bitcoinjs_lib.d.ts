@@ -1,7 +1,7 @@
+/// <reference types="node" />
 import BaseCoin from './base_coin';
 import { BIP32Interface } from 'bip32';
-import { Network, Transaction, TransactionBuilder } from 'bitcoinjs-lib';
-import { ECPairInterface } from 'bitcoinjs-lib/types/ecpair';
+import { Network, Transaction, Psbt } from 'bitcoinjs-lib';
 export interface Utxo {
     txid?: string;
     wif: string | string[];
@@ -137,7 +137,7 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
      * @param compress 是否进行压缩
      * @param network
      */
-    getKeyPairFromMint(mintStr: string, compress?: boolean, network?: string): ECPairInterface;
+    getKeyPairFromMint(mintStr: string, compress?: boolean, network?: string): any;
     getPrivateKeyFromMint(mintStr: string): string;
     /**
      * 由私钥和path推导出下级节点的所有信息，path中带有'的地址称为hardened address
@@ -256,5 +256,5 @@ export default abstract class BaseBitcoinjsLib extends BaseCoin {
      * @returns {*|Transaction}
      * @private
      */
-    _signUtxos(txBuilder: TransactionBuilder, utxos: Utxo[], network: Network): Transaction;
+    _signUtxos(txBuilder: Psbt, utxos: Utxo[], network: Network): Transaction;
 }

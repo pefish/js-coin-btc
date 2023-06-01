@@ -1,6 +1,6 @@
-import '@pefish/js-node-assist'
 import Client from 'bitcoin-core'
 import ErrorHelper from '@pefish/js-error';
+import {StringUtil} from "@pefish/js-node-assist";
 
 export interface RemoteConfig {
   host: string
@@ -36,7 +36,7 @@ export default class Remote {
     }
     const proposeNetworkFee = feerate.multi_(txSize).div_(1000).multi_(1.2)
     if (!feerate) {
-      networkFee = downNetworkFee.add_(upNetworkFee).div_(2)
+      networkFee = StringUtil.start(downNetworkFee).add(upNetworkFee).div(2).toString()
     } else if (proposeNetworkFee.lt_(downNetworkFee)) {
       networkFee = downNetworkFee
     } else if (proposeNetworkFee.gt_(upNetworkFee)) {

@@ -1,14 +1,5 @@
-import '@pefish/js-node-assist'
 import BitcoinWalletHelper from './wallet'
 import assert from 'assert'
-
-declare global {
-  namespace NodeJS {
-    interface Global {
-      logger: any;
-    }
-  }
-}
 
 describe('bitcoinWalletHelper', () => {
 
@@ -22,25 +13,25 @@ describe('bitcoinWalletHelper', () => {
   it('verifyAddressType', async () => {
     try {
       const result1 = walletHelper.verifyAddressType(`18cN2hvpn4KHKKuGQMz7wQBDKKumRhN7Z3`, `p2pkh`, mainnet)
-      // logger.error(result)
+      // console.error(result)
       assert.strictEqual(result1, true)
       const result2 = walletHelper.verifyAddressType(`bc1q2du0uhvgwmj9e7gn9en080j986gtvsa6tl8zc4`, `p2wpkh`, mainnet)
-      // logger.error(result)
+      // console.error(result)
       assert.strictEqual(result2, true)
       const result3 = walletHelper.verifyAddressType(`36v5uJ54F4VwJU2qzf3t2FQdHgL7d38HUg`, `p2sh(p2wpkh)`, mainnet)
-      // logger.error(result)
+      // console.error(result)
       assert.strictEqual(result3, true)
       const result4 = walletHelper.verifyAddressType(`bc1q7wewmjmhdm8axyf3s8vyqlr9fqqtpzpfa9m56ttksywxzw0w34vsnhsz57`, `p2wsh(p2ms)`, mainnet)
-      // logger.error(result4)
+      // console.error(result4)
       assert.strictEqual(result4, true)
       const result5 = walletHelper.verifyAddressType(`33ftreLmAd5UfUo36xogBUW29qPN11dWq4`, `p2sh(p2wsh(p2ms))`, mainnet)
-      // logger.error(result)
+      // console.error(result)
       assert.strictEqual(result5, true)
       const result6 = walletHelper.verifyAddressType(`3AgHM7WNCqxc5AUr1g69uK4ikKCgrqb5cZ`, `p2sh(p2ms)`, mainnet)
-      // logger.error(result)
+      // console.error(result)
       assert.strictEqual(result6, true)
     } catch (err) {
-      global.logger.error(err)
+      console.error(err)
       assert.throws(() => {}, err)
     }
   })
@@ -48,19 +39,19 @@ describe('bitcoinWalletHelper', () => {
   it('getAddressType', async () => {
     try {
       const result1 = walletHelper.getAddressType(`18cN2hvpn4KHKKuGQMz7wQBDKKumRhN7Z3`, mainnet)
-      // logger.error(result)
+      // console.error(result)
       assert.strictEqual(result1, `p2pkh`)
       const result2 = walletHelper.getAddressType(`bc1q2du0uhvgwmj9e7gn9en080j986gtvsa6tl8zc4`, mainnet)
-      // logger.error(result)
+      // console.error(result)
       assert.strictEqual(result2, `p2wpkh`)
       const result3 = walletHelper.getAddressType(`36v5uJ54F4VwJU2qzf3t2FQdHgL7d38HUg`, mainnet)
-      // logger.error(result)
+      // console.error(result)
       assert.strictEqual(result3.length === 3, true)
       const result4 = walletHelper.getAddressType(`bc1q7wewmjmhdm8axyf3s8vyqlr9fqqtpzpfa9m56ttksywxzw0w34vsnhsz57`, mainnet)
-      // logger.error(result4)
+      // console.error(result4)
       assert.strictEqual(result4, `p2wsh(p2ms)`)
     } catch (err) {
-      global.logger.error(err)
+      console.error(err)
       assert.throws(() => {}, err)
     }
   })
@@ -69,13 +60,13 @@ describe('bitcoinWalletHelper', () => {
   it('isAddress', async () => {
     try {
       const result = walletHelper.isAddress(`36v5uJ54F4VwJU2qzf3t2FQdHgL7d38HUg`, mainnet)
-      // logger.error(result)
+      // console.error(result)
       assert.strictEqual(result, true)
       const result1 = walletHelper.isAddress(`3AgHM7WNCqxc5AUr1g69uK4ikKCgrqb5cZ`, mainnet)
-      // logger.error(result1)
+      // console.error(result1)
       assert.strictEqual(result1, true)
     } catch (err) {
-      global.logger.error(err)
+      console.error(err)
       assert.throws(() => {}, err)
     }
   })
@@ -83,10 +74,10 @@ describe('bitcoinWalletHelper', () => {
   it('convertPub', async () => {
     try {
       const result = walletHelper.convertPub(`ypub`, `xpub6G7UGdTHmM3aX7BQGfX23YMvFXx9sMMTC2xYFDW5JkHC3aLsBCTaeoRevrz315PZRFeBaRdjEQo3kPqHDytwmGaUV9ZjSxqukscuaG5CqVb`)
-      // logger.error(result)
+      // console.error(result)
       assert.strictEqual(result, 'ypub6awjaJ8Cv2b4NQNX72JeFdTRRW6boyLx79Um2cPxgkf56gA6Rrd9Gs5nx4wczz3UptkzKuEHh59bdgSqwgJxZWG5MVGA2sfQ2bgYxn8rJwt')
     } catch (err) {
-      global.logger.error(err)
+      console.error(err)
       assert.throws(() => {}, err)
     }
   })
@@ -94,10 +85,10 @@ describe('bitcoinWalletHelper', () => {
   it('convertPrv', async () => {
     try {
       const result = walletHelper.convertPub(`ypub`, `xprv9s21ZrQH143K3J8How7cEP3KCkTz3R3QiSXFVBXBWAbfwyqFHu1aEMrk8V78fqZpf7LrVYZmyybDNDqZ5QahCtaha9E1i5zm1A9kMrqSFNn`)
-      // logger.error(result)
+      // console.error(result)
       assert.strictEqual(result, 'ypub6QqdH2c5z79675PskKSEoc5YvkSvPVkkzmy54xpgSWWXssyd66VPQDqMztCzkvNLUUuf9UHG7PhDrwzugmVFkyrTxVEp9KdJCk6dWT1726J')
     } catch (err) {
-      global.logger.error(err)
+      console.error(err)
       assert.throws(() => {}, err)
     }
   })
@@ -105,10 +96,10 @@ describe('bitcoinWalletHelper', () => {
   it('getSeedByMnemonic', async () => {
     try {
       const result = walletHelper.getSeedByMnemonic(`depth fruit animal borrow room pen nice proud cement limit thank that`, ``)
-      // logger.error(result)
+      // console.error(result)
       assert.strictEqual(result, '44cbf72322549594ab47801454ced2e970c2a9463d4c37d12951ebc41f56ad2e94024013221e3872a6eef8624f8a9b8a731f038c46689b88975fcb93931a40fd')
     } catch (err) {
-      global.logger.error(err)
+      console.error(err)
       assert.throws(() => {}, err)
     }
   })
@@ -116,10 +107,10 @@ describe('bitcoinWalletHelper', () => {
   it('generateMnemonic', async () => {
     try {
       const result = walletHelper.generateMnemonic()
-      // logger.error(result)
+      // console.error(result)
       assert.strictEqual(result.length > 20, true)
     } catch (err) {
-      global.logger.error(err)
+      console.error(err)
       assert.throws(() => {}, err)
     }
   })
@@ -127,14 +118,14 @@ describe('bitcoinWalletHelper', () => {
   it('getAllFromXpriv', async () => {
     try {
       const result = walletHelper.getAllFromXpriv('xprvA387s7vPvyVHJd6wAdz1gQRBhW7fTtdbpp2wSq6TkQkDAn1idf9L717B5c1yXxGCPFYjwxVSPejzLsnpuk82N9Dpr9bk8SGEwjYN1112VVz', mainnet)
-      // logger.error(result)
+      // console.error(result)
       assert.strictEqual(result['wif'], 'L5nNnEKwmb1Yxh6neMKn5Srum3NBjTpPtNHFpNPJS3Dqh2yTcsyy')
       assert.strictEqual(result['chainCode'], '6f8847d408fe5c7f695c8140722b113f7b34f1bba27cee489f11c2da677b0ec6')
       assert.strictEqual(result['publicKey'], '02f7166a1fd8dd1b253667c63af6e580d9867abe79e48d4df655c98b71fd81a8e8')
       assert.strictEqual(result['privateKey'], 'ff80e6800f8e0b9c27431f3cf6c4346175eaad12745a91bd41c7141e70c58378')
       assert.strictEqual(result['xpub'], 'xpub6G7UGdTHmM3aX7BQGfX23YMvFXx9sMMTC2xYFDW5JkHC3aLsBCTaeoRevrz315PZRFeBaRdjEQo3kPqHDytwmGaUV9ZjSxqukscuaG5CqVb')
     } catch (err) {
-      global.logger.error(err)
+      console.error(err)
       assert.throws(() => {}, err)
     }
   })
@@ -142,11 +133,11 @@ describe('bitcoinWalletHelper', () => {
   it('getAllFromWif', async () => {
     try {
       const result = walletHelper.getAllFromWif('L5nNnEKwmb1Yxh6neMKn5Srum3NBjTpPtNHFpNPJS3Dqh2yTcsyy', mainnet)
-      // logger.error(result)
+      // console.error(result)
       assert.strictEqual(result['publicKey'], '02f7166a1fd8dd1b253667c63af6e580d9867abe79e48d4df655c98b71fd81a8e8')
       assert.strictEqual(result['privateKey'], 'ff80e6800f8e0b9c27431f3cf6c4346175eaad12745a91bd41c7141e70c58378')
     } catch (err) {
-      global.logger.error(err)
+      console.error(err)
       assert.throws(() => {}, err)
     }
   })
@@ -154,10 +145,10 @@ describe('bitcoinWalletHelper', () => {
   it('getAllFromPrivateKey', async () => {
     try {
       const result = walletHelper.getAllFromPrivateKey('0xff80e6800f8e0b9c27431f3cf6c4346175eaad12745a91bd41c7141e70c58378', mainnet)
-      // logger.error(result)
+      // console.error(result)
       assert.strictEqual(result['publicKey'], '02f7166a1fd8dd1b253667c63af6e580d9867abe79e48d4df655c98b71fd81a8e8')
     } catch (err) {
-      global.logger.error(err)
+      console.error(err)
       assert.throws(() => {}, err)
     }
   })
@@ -165,11 +156,11 @@ describe('bitcoinWalletHelper', () => {
   it('getAllFromXpub', async () => {
     try {
       const result = walletHelper.getAllFromXpub(`xpub6G7UGdTHmM3aX7BQGfX23YMvFXx9sMMTC2xYFDW5JkHC3aLsBCTaeoRevrz315PZRFeBaRdjEQo3kPqHDytwmGaUV9ZjSxqukscuaG5CqVb`, mainnet)
-      // logger.error(result)
+      // console.error(result)
       assert.strictEqual(result['chainCode'], '6f8847d408fe5c7f695c8140722b113f7b34f1bba27cee489f11c2da677b0ec6')
       assert.strictEqual(result['publicKey'], '02f7166a1fd8dd1b253667c63af6e580d9867abe79e48d4df655c98b71fd81a8e8')
     } catch (err) {
-      global.logger.error(err)
+      console.error(err)
       assert.throws(() => {}, err)
     }
   })
@@ -177,10 +168,10 @@ describe('bitcoinWalletHelper', () => {
   it('deriveAllByXpubPath', async () => {
     try {
       const result = walletHelper.deriveAllByXpubPath('xpub6G7UGdTHmM3aX7BQGfX23YMvFXx9sMMTC2xYFDW5JkHC3aLsBCTaeoRevrz315PZRFeBaRdjEQo3kPqHDytwmGaUV9ZjSxqukscuaG5CqVb', `0`, mainnet)
-      // logger.error(result)
+      // console.error(result)
       assert.strictEqual(result[`publicKey`], '021c911e5b000f8820715e7a55a9672fd137e23e374d55396b87d4e555978425df')
     } catch (err) {
-      global.logger.error(err)
+      console.error(err)
       assert.throws(() => {}, err)
     }
   })
@@ -188,12 +179,13 @@ describe('bitcoinWalletHelper', () => {
   it('deriveAllByXprivPath', async () => {
     try {
       const result = walletHelper.deriveAllByXprivPath(`xprv9s21ZrQH143K3J8How7cEP3KCkTz3R3QiSXFVBXBWAbfwyqFHu1aEMrk8V78fqZpf7LrVYZmyybDNDqZ5QahCtaha9E1i5zm1A9kMrqSFNn`, `m/44'/0'/0'/0/0`, mainnet)
-      // logger.error(result)
+      console.error(result)
       assert.strictEqual(result['wif'], 'L5nNnEKwmb1Yxh6neMKn5Srum3NBjTpPtNHFpNPJS3Dqh2yTcsyy')
       assert.strictEqual(result['xpub'], 'xpub6G7UGdTHmM3aX7BQGfX23YMvFXx9sMMTC2xYFDW5JkHC3aLsBCTaeoRevrz315PZRFeBaRdjEQo3kPqHDytwmGaUV9ZjSxqukscuaG5CqVb')
       assert.strictEqual(result['xpriv'], 'xprvA387s7vPvyVHJd6wAdz1gQRBhW7fTtdbpp2wSq6TkQkDAn1idf9L717B5c1yXxGCPFYjwxVSPejzLsnpuk82N9Dpr9bk8SGEwjYN1112VVz')
+      assert.strictEqual(result['publicKey'], '02f7166a1fd8dd1b253667c63af6e580d9867abe79e48d4df655c98b71fd81a8e8')
     } catch (err) {
-      global.logger.error(err)
+      console.error(err)
       assert.throws(() => {}, err)
     }
   })
@@ -207,11 +199,15 @@ describe('bitcoinWalletHelper', () => {
       assert.strictEqual(p2wpkh.address, `bc1q2du0uhvgwmj9e7gn9en080j986gtvsa6tl8zc4`)
       assert.strictEqual(p2wpkh.redeemScript, ``)
       const segwit = walletHelper.getAddressInfoFromPublicKey('02f7166a1fd8dd1b253667c63af6e580d9867abe79e48d4df655c98b71fd81a8e8', `p2sh(p2wpkh)`, mainnet)
-      // logger.error(segwit)
+      // console.error(segwit)
       assert.strictEqual(segwit.address, `36v5uJ54F4VwJU2qzf3t2FQdHgL7d38HUg`)
       assert.strictEqual(segwit.redeemScript, `00145378fe5d8876e45cf9132e66f3be453e90b643ba`)
+      const taproot = walletHelper.getAddressInfoFromPublicKey('02f7166a1fd8dd1b253667c63af6e580d9867abe79e48d4df655c98b71fd81a8e8', `p2tr`, mainnet)
+      // console.error(taproot)
+      assert.strictEqual(taproot.address, `bc1p86hcchtcwh935sulc2tvp5fl2jn5tnnmg7wte7jv2dedkzltptpst8rjvj`)
+      assert.strictEqual(taproot.redeemScript, `51203eaf8c5d7875cb1a439fc296c0d13f54a745ce7b479cbcfa4c5372db0beb0ac3`)
     } catch (err) {
-      global.logger.error(err)
+      console.error(err)
       assert.throws(() => {}, err)
     }
   })
@@ -220,16 +216,16 @@ describe('bitcoinWalletHelper', () => {
     try {
       const result = walletHelper.getAllFromWif('KwyadqQkPHVkQsreCS2dVrHBQE79TNiDHPjrP9aTL8Zc9BWrf4U6', mainnet)
       const p2pkh = walletHelper.getAddressInfoFromPublicKey(result[`publicKey`], `p2pkh`, mainnet)
-      // global.logger.error(p2pkh)
+      // console.error(p2pkh)
       assert.strictEqual(p2pkh.address, `1LKz7cLQVSTzPdg8yP1pbKU1hiYSXtvnWK`)
       const p2wpkh = walletHelper.getAddressInfoFromPublicKey(result[`publicKey`], `p2wpkh`, mainnet)
-      // global.logger.error(p2wpkh)
+      // console.error(p2wpkh)
       assert.strictEqual(p2wpkh.address, `bc1q6sqcmdp8ql5c6wkapqyhppqkk36gdhxsdu2ek6`)
       const segwit = walletHelper.getAddressInfoFromPublicKey(result[`publicKey`], `p2sh(p2wpkh)`, mainnet)
-      // global.logger.error(segwit)
+      // console.error(segwit)
       assert.strictEqual(segwit.address, `3MJZpHDFq6kBuPYvePvw1F7tDefwexuFSF`)
     } catch (err) {
-      global.logger.error(err)
+      console.error(err)
       assert.throws(() => {}, err)
     }
   })
@@ -245,10 +241,10 @@ describe('bitcoinWalletHelper', () => {
         ],
         m: 2
       }, `p2wsh(p2ms)`, mainnet)
-      // logger.error(result1)
+      // console.error(result1)
       assert.strictEqual(result1.address, `bc1q7wewmjmhdm8axyf3s8vyqlr9fqqtpzpfa9m56ttksywxzw0w34vsnhsz57`)
     } catch (err) {
-      global.logger.error(err)
+      console.error(err)
       assert.throws(() => {}, err)
     }
   })
@@ -264,10 +260,10 @@ describe('bitcoinWalletHelper', () => {
         ],
         m: 2
       }, `p2sh(p2wsh(p2ms))`, mainnet)
-      // logger.error(result1)
+      // console.error(result1)
       assert.strictEqual(result1.address, `33ftreLmAd5UfUo36xogBUW29qPN11dWq4`)
     } catch (err) {
-      global.logger.error(err)
+      console.error(err)
       assert.throws(() => {}, err)
     }
   })
@@ -283,10 +279,10 @@ describe('bitcoinWalletHelper', () => {
         ],
         m: 2
       }, `p2sh(p2ms)`, mainnet)
-      // logger.error(result1)
+      // console.error(result1)
       assert.strictEqual(result1.address, `3AgHM7WNCqxc5AUr1g69uK4ikKCgrqb5cZ`)
     } catch (err) {
-      global.logger.error(err)
+      console.error(err)
       assert.throws(() => {}, err)
     }
   })
@@ -294,10 +290,10 @@ describe('bitcoinWalletHelper', () => {
   it('validateMnemonic', async () => {
     try {
       const result = walletHelper.validateMnemonic('depth fruit animal borrow room pen nice proud cement limit thank that')
-      // logger.error(result)
+      // console.error(result)
       assert.strictEqual(result, true)
     } catch (err) {
-      global.logger.error(err)
+      console.error(err)
       assert.throws(() => {}, err)
     }
   })
@@ -305,11 +301,11 @@ describe('bitcoinWalletHelper', () => {
   it('getMasterPairByMnemonic', async () => {
     try {
       const result = walletHelper.getMasterPairByMnemonic('depth fruit animal borrow room pen nice proud cement limit thank that', '', 'mainnet')
-      // global.logger.error(result)
+      // console.error(result)
       assert.strictEqual(result[`xpriv`], 'xprv9s21ZrQH143K3J8How7cEP3KCkTz3R3QiSXFVBXBWAbfwyqFHu1aEMrk8V78fqZpf7LrVYZmyybDNDqZ5QahCtaha9E1i5zm1A9kMrqSFNn')
       assert.strictEqual(result[`seed`], '44cbf72322549594ab47801454ced2e970c2a9463d4c37d12951ebc41f56ad2e94024013221e3872a6eef8624f8a9b8a731f038c46689b88975fcb93931a40fd')
     } catch (err) {
-      global.logger.error(err)
+      console.error(err)
       assert.throws(() => {}, err)
     }
   })
@@ -347,7 +343,7 @@ describe('bitcoinWalletHelper', () => {
       )
       assert.strictEqual(tx['txId'], '1de2da16c04f62e8dff1ced47d86d468bb1ff637a1dc42a8c0636853b8ab5dce')
     } catch (err) {
-      global.logger.error(err)
+      console.error(err)
       assert.throws(() => {}, err)
     }
   })
@@ -382,10 +378,10 @@ describe('bitcoinWalletHelper', () => {
         '2N4fbYKCkNLLLfzJH7WfQRwYKpJTz7a5gX6',
         testnet
       )
-      // logger.error(JSON.stringify(tx))
+      // console.error(JSON.stringify(tx))
       assert.strictEqual(tx['txId'], 'f25671a7bbec794a4b895bb1a0cbc058dc31315ada985a8c8082bf2dd948b54c')
     } catch (err) {
-      global.logger.error(err)
+      console.error(err)
       assert.throws(() => {}, err)
     }
   })
@@ -413,10 +409,10 @@ describe('bitcoinWalletHelper', () => {
         ],
         testnet
       )
-      // logger.error(tx)
+      // console.error(tx)
       assert.strictEqual(tx['txId'], '862e9cd3a8d3c23af95c8166a9b0e76ee7f66c7b3227fecf7764abd4b4c586c7')
     } catch (err) {
-      global.logger.error(err)
+      console.error(err)
       assert.throws(() => {}, err)
     }
   })
@@ -427,10 +423,10 @@ describe('bitcoinWalletHelper', () => {
         '0200000001e6354ac7aae96b8c49f6bb4099b703e7bb3f485552d7df29df4e19e17d78660f00000000fdfd000047304402200364ff1f8d638dcf191b9dfbac8adeb8f3c6a026cae9fcb7b7bf810ebf63159a02200984ecfa27a2a767ccf2dae2f9dd3537b6d8cb7d9c107254db633df7b757367801483045022100a2a959e9845a0405c58dc5dba0afecf4604fb0a06dc335cd236b5358d24d15520220622c86d020813e6a5c10121a009a66d6fcf9b030ec9032248398002ea6c70559014c695221026b390a4dd7d4510a5724dc30004f7d5ea417b726fa473edf4302b23c40b2fe5e21031b022777c4e4ddf7cdbb216c51c9666b4f59636cc11f2ad15022ef5e0f0ca3972102603d30c9d52a6f2299aeb2d57826d1f185a33053950981955877be970794d28c53aeffffffff02c02709000000000017a914341a524ec4d39df8f20de8904f1c8f668483802c87407e05000000000017a9148e708e9353853c2d2c37f9b15a85e221a73daf668700000000',
         mainnet
       )
-      // global.logger.error(tx)
+      // console.error(tx)
       assert.strictEqual(tx['txId'], '2423655857d066e2236bbe66ebe8b3289b931fc1ab6705b559b633a1cd686d54')
     } catch (err) {
-      global.logger.error(err)
+      console.error(err)
       assert.throws(() => {}, err)
     }
   })
